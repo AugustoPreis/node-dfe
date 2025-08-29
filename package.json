@@ -1,0 +1,39 @@
+{
+  "name": "node-dfe",
+  "version": "1.0.0",
+  "description": "SDK não oficial para integração com a API da Nuvem Fiscal em Node.js",
+  "author": "Augusto Preis Tomasi <augustopreisthomasi@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AugustoPreis/node-dfe.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "keywords": [
+    "nuvem fiscal",
+    "nfe",
+    "nfse",
+    "sdk",
+    "api",
+    "node"
+  ],
+  "dependencies": {
+    "axios": "^1.7.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-typescript": "^7.27.1",
+    "@eslint/js": "^9.34.0",
+    "@types/node": "^20.14.2",
+    "eslint": "^9.34.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.41.0"
+  }
+}

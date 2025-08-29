@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* --- Configurações do Projeto --- */
+    "target": "ES2020", // Compila para uma versão moderna do ECMAScript
+    "module": "CommonJS", // Usa o sistema de módulos padrão do Node.js
+    "outDir": "./dist", // Diretório de saída para os arquivos compilados
+    "rootDir": "./src", // Diretório raiz dos seus arquivos fonte .ts
+    "declaration": true, // Gera os arquivos .d.ts, essencial para uma biblioteca
+    "sourceMap": true, // Gera source maps para facilitar o debug
+    /* --- Checagem de Tipos Estrita --- */
+    "strict": true, // Habilita todas as opções de checagem estrita
+    "noImplicitAny": true, // Acusa erro em variáveis com tipo 'any' implícito
+    "strictNullChecks": true, // Diferencia 'null' e 'undefined' dos outros tipos
+    "strictFunctionTypes": true, // Checagem mais forte para tipos de função
+    "alwaysStrict": true, // Garante que 'use strict' seja emitido no JavaScript final
+    /* --- Resolução de Módulos --- */
+    "moduleResolution": "node", // Como o TS procura por módulos
+    "esModuleInterop": true, // Melhora a compatibilidade entre CommonJS e ES Modules
+    "resolveJsonModule": true, // Permite importar arquivos .json
+    /* --- Opções Avançadas --- */
+    "skipLibCheck": true, // Pula a checagem de tipos dos arquivos de declaração (.d.ts)
+    "forceConsistentCasingInFileNames": true // Garante que o casing dos arquivos seja consistente
+  },
+  "include": [ // Quais arquivos o TS deve compilar
+    "src/**/*"
+  ],
+  "exclude": [ // Quais arquivos o TS NÃO deve compilar
+    "node_modules",
+    "dist",
+    "**/*.test.ts"
+  ]
+}
