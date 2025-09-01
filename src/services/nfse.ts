@@ -1,5 +1,5 @@
 import { HttpClient } from '../core/httpClient';
-import { CidadesAtendidasResposta, ConsultaCancelamentoResposta, ConsultaLoteResposta, ConsultaResposta, ListagemLotesResposta, ListagemResposta, ParametrosListagem, ParametrosListagemLotes } from '../types/nfse';
+import { CidadesAtendidasResposta, ConsultaCancelamentoResposta, ConsultaLoteResposta, ConsultaResposta, ListagemLotesResposta, ListagemResposta, ParametrosEmissao, ParametrosListagem, ParametrosListagemLotes } from '../types/nfse';
 
 const BASE = '/nfse';
 
@@ -52,5 +52,9 @@ export class NFSeService {
 
   async cidadesAtendidas(codigoIbge: string): Promise<CidadesAtendidasResposta> {
     return await this.httpClient.get<CidadesAtendidasResposta>(`${BASE}/cidades/${codigoIbge}`);
+  }
+
+  async emitir(dados: ParametrosEmissao): Promise<ConsultaResposta> {
+    return await this.httpClient.post<ConsultaResposta>(`${BASE}/dps`, dados);
   }
 }
