@@ -366,3 +366,11 @@ export interface ParametrosEmissaoLote {
   referencia?: string | null;
   documentos: ParametrosEmissao[];
 }
+
+export interface ParametrosCancelamento {
+  id: string;
+  codigo?: string;
+  motivo?: string;
+}
+
+export type CancelamentoResposta = ListagemResposta['data'][0]['cancelamento'];

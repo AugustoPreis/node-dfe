@@ -1,10 +1,12 @@
 import { HttpClient } from '../core/httpClient';
 import {
+  CancelamentoResposta,
   ConsultaCancelamentoResposta,
   ConsultaLoteResposta,
   ConsultaResposta,
   ListagemLotesResposta,
   ListagemResposta,
+  ParametrosCancelamento,
   ParametrosEmissao,
   ParametrosEmissaoLote,
   ParametrosListagem,
@@ -66,5 +68,12 @@ export class NFSeService {
 
   async emitirLote(dados: ParametrosEmissaoLote): Promise<ConsultaLoteResposta> {
     return await this.httpClient.post<ConsultaLoteResposta>(`${BASE}/dps/lotes`, dados);
+  }
+
+  async cancelar(dados: ParametrosCancelamento): Promise<CancelamentoResposta> {
+    return await this.httpClient.post<CancelamentoResposta>(`${BASE}/${dados.id}/cancelamento`, {
+      codigo: dados.codigo,
+      motivo: dados.motivo,
+    });
   }
 }
