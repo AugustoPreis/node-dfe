@@ -1,6 +1,5 @@
 import { HttpClient } from '../core/httpClient';
 import {
-  CidadesAtendidasResposta,
   ConsultaCancelamentoResposta,
   ConsultaLoteResposta,
   ConsultaResposta,
@@ -59,10 +58,6 @@ export class NFSeService {
 
   async consultarCancelamento(id: string): Promise<ConsultaCancelamentoResposta> {
     return await this.httpClient.get<ConsultaCancelamentoResposta>(`${BASE}/${id}/cancelamento`);
-  }
-
-  async cidadesAtendidas(codigoIbge: string): Promise<CidadesAtendidasResposta> {
-    return await this.httpClient.get<CidadesAtendidasResposta>(`${BASE}/cidades/${codigoIbge}`);
   }
 
   async emitir(dados: ParametrosEmissao): Promise<ConsultaResposta> {

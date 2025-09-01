@@ -77,15 +77,6 @@ export type ConsultaResposta = ListagemResposta['data'][0];
 export type ConsultaLoteResposta = ListagemLotesResposta['data'][0];
 export type ConsultaCancelamentoResposta = ConsultaResposta['cancelamento'];
 
-export interface CidadesAtendidasResposta {
-  codigo_ibge: string;
-  uf: string;
-  municipio: string;
-  provedor: Provedor;
-  ambientes: Ambiente[];
-  credenciais: Array<'certificado' | 'login_senha' | 'token'>;
-}
-
 export interface ParametrosEmissao {
   provedor?: Provedor;
   ambiente: Ambiente;
