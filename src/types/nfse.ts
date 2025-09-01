@@ -368,3 +368,10 @@ export interface ParametrosEmissao {
     };
   };
 }
+
+export interface ParametrosEmissaoLote {
+  provedor?: Provedor;
+  ambiente: Ambiente;
+  referencia?: string | null;
+  documentos: ParametrosEmissao[];
+}

@@ -1,5 +1,16 @@
 import { HttpClient } from '../core/httpClient';
-import { CidadesAtendidasResposta, ConsultaCancelamentoResposta, ConsultaLoteResposta, ConsultaResposta, ListagemLotesResposta, ListagemResposta, ParametrosEmissao, ParametrosListagem, ParametrosListagemLotes } from '../types/nfse';
+import {
+  CidadesAtendidasResposta,
+  ConsultaCancelamentoResposta,
+  ConsultaLoteResposta,
+  ConsultaResposta,
+  ListagemLotesResposta,
+  ListagemResposta,
+  ParametrosEmissao,
+  ParametrosEmissaoLote,
+  ParametrosListagem,
+  ParametrosListagemLotes
+} from '../types/nfse';
 
 const BASE = '/nfse';
 
@@ -56,5 +67,9 @@ export class NFSeService {
 
   async emitir(dados: ParametrosEmissao): Promise<ConsultaResposta> {
     return await this.httpClient.post<ConsultaResposta>(`${BASE}/dps`, dados);
+  }
+
+  async emitirLote(dados: ParametrosEmissaoLote): Promise<ConsultaLoteResposta> {
+    return await this.httpClient.post<ConsultaLoteResposta>(`${BASE}/dps/lotes`, dados);
   }
 }
