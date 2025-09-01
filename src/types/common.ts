@@ -1,4 +1,5 @@
 export type Ambiente = 'producao' | 'homologacao';
+export type Provedor = 'padrao' | 'nacional';
 
 export interface SdkConfig {
   environment: Ambiente;
