@@ -47,19 +47,16 @@ Para manter o código organizado e consistente, seguimos alguns padrões.
 
 Vamos supor que você queira adicionar o método `inutilizarNumeracao` ao serviço de NF-e.
 
-1.  **Defina os Tipos (`src/types/nfeTypes.ts`)**
-    Primeiro, vá ao arquivo de tipos e crie as interfaces para os dados de entrada (`InutilizacaoNfeInput`) e de saída (`InutilizacaoNfeOutput`), conforme a documentação da API.
+1.  **Defina os Tipos (`src/types/nfe.ts`)**
+    Primeiro, vá ao arquivo de tipos e crie as interfaces para os dados de entrada (`ParametrosInutilizacao`) e de saída (`InutilizacaoResposta`), conforme a documentação da API.
 
     ```typescript
-    export interface InutilizacaoNfeInput {
-        ano: number;
-        serie: number;
-        numero_inicial: number;
-        numero_final: number;
+    export interface ParametrosInutilizacao {
         justificativa: string;
+        // ... outros parâmetros
     }
 
-    export interface InutilizacaoNfeOutput {
+    export interface InutilizacaoResposta {
         status: string;
         // ... outros campos da resposta
     }
@@ -70,13 +67,12 @@ Vamos supor que você queira adicionar o método `inutilizarNumeracao` ao servi�
 
     ```typescript
     // Dentro da classe NFeService
-    import { InutilizacaoNfeInput, InutilizacaoNfeOutput } from '../types/nfeTypes';
+    import { ParametrosInutilizacao, InutilizacaoResposta } from '../types/nfeTypes';
 
     // ...
 
-    async inutilizarNumeracao(dados: InutilizacaoNfeInput): Promise<InutilizacaoNfeOutput> {
-        const path = `${this.basePath}/inutilizacao`;
-        return this.httpClient.post<InutilizacaoNfeOutput>(path, dados);
+    async inutilizarNumeracao(dados: ParametrosInutilizacao): Promise<InutilizacaoResposta> {
+        return this.httpClient.post<InutilizacaoResposta>(`${BASE}/inutilizacao`, dados);
     }
     ```
 
@@ -103,10 +99,10 @@ Vamos supor que você queira adicionar o método `inutilizarNumeracao` ao servi�
 
 ## 🎨 Padrões de Código
 
-- **Linting e Formatação**: Usamos ESLint e Prettier para manter o código limpo e padronizado. Antes de commitar, rode:
+- **Linting e Formatação**: Usamos ESLint para manter o código limpo e padronizado. Antes de commitar, rode:
   ```bash
   npm run lint:fix
   ```
-- **Comentários**: Use JSDoc para todos os métodos públicos, explicando o que fazem, seus parâmetros (`@param`) e o que retornam (`@returns`).
+- **Comentários**: Documente todas as funcionalidades, explicando o que fazem, seus parâmetros e o que retornam.
 
 Obrigado por ajudar a tornar o `node-dfe` ainda melhor!
