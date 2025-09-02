@@ -76,4 +76,16 @@ export class NFSeService {
       motivo: dados.motivo,
     });
   }
+
+  async baixarPDF(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/pdf`, {
+      responseType: 'arraybuffer',
+    });
+  }
+
+  async baixarXML(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml`, {
+      responseType: 'arraybuffer',
+    });
+  }
 }

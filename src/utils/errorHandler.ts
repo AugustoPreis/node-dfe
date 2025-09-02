@@ -22,7 +22,13 @@ export class NuvemFiscalApiError extends Error {
 // Função que converte um AxiosError em nosso erro customizado
 export function handleApiError(error: AxiosError): NuvemFiscalApiError {
   if (error.response) { //Resposta foi recebida (com status >= 400)
-    const data = error.response.data || {};
+    let data = error.response.data || {};
+
+    // Casos em que o "responseType": 'arraybuffer'
+    if (Buffer.isBuffer(data)) {
+      data = JSON.parse(data.toString());
+    }
+
     const { message, code, errors } = extractErrorDetails(data);
 
     return new NuvemFiscalApiError(message, error.response.status, code, errors);
