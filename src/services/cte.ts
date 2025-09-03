@@ -40,7 +40,7 @@ export class CTeService {
   }
 
   async baixarXML(id: string, processada = true): Promise<Buffer> {
-    return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml${processada ? '' : '/nota'}`, {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml${processada ? '' : '/conhecimento'}`, {
       responseType: 'arraybuffer',
     });
   }
