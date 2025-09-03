@@ -4,6 +4,26 @@ export type StatusDfe = 'pendente' | 'autorizado' | 'rejeitado' | 'denegado' | '
 export type StatusEventoDfe = 'pendente' | 'registrado' | 'rejeitado' | 'erro';
 export type StatusDfeLote = 'pendente' | 'processado' | 'erro';
 
+export interface DfeListagemQuery {
+  $top?: string;
+  $skip?: string;
+  $inlinecount?: boolean;
+  cpf_cnpj: string;
+  referencia?: string;
+  ambiente: Ambiente;
+  chave?: string;
+  serie?: string;
+}
+
+export interface DfeListagemLotesQuery {
+  $top?: string;
+  $skip?: string;
+  $inlinecount?: boolean;
+  cpf_cnpj: string;
+  referencia?: string;
+  ambiente: Ambiente;
+}
+
 export interface DfeListagem {
   '@count'?: number;
   data?: Dfe[];
