@@ -1,11 +1,10 @@
 import { HttpClient } from '../core/httpClient';
+import { DfeListagemLotesQuery, DfeListagemQuery } from '../types/dfe';
 import {
   Nfse,
   NfseCancelamento,
   NfseDpsPedidoEmissao,
   NfseListagem,
-  NfseListagemLotesQuery,
-  NfseListagemQuery,
   NfseLoteDpsPedidoEmissao,
   NfsePedidoCancelamento,
   RpsLote,
@@ -21,7 +20,7 @@ export class NFSeService {
     this.httpClient = httpClient;
   }
 
-  async listar(params: NfseListagemQuery): Promise<NfseListagem> {
+  async listar(params: DfeListagemQuery): Promise<NfseListagem> {
     return await this.httpClient.get<NfseListagem>(BASE, {
       params: {
         $top: params.$top,
@@ -36,8 +35,7 @@ export class NFSeService {
     });
   }
 
-
-  async listarLotes(params: NfseListagemLotesQuery): Promise<RpsLoteListagem> {
+  async listarLotes(params: DfeListagemLotesQuery): Promise<RpsLoteListagem> {
     return await this.httpClient.get<RpsLoteListagem>(`${BASE}/lotes`, {
       params: {
         $top: params.$top,

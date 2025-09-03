@@ -1,6 +1,16 @@
 import { HttpClient } from '../core/httpClient';
-import { NfeListagemLotesQuery, NfeListagemQuery, NfePedidoCancelamento, NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
-import { Dfe, DfeCancelamento, DfeInutilizacao, DfeListagem, DfeLote, DfeLoteListagem, DfePedidoInutilizacao } from '../types/dfe';
+import { NfePedidoCancelamento, NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
+import {
+  Dfe,
+  DfeListagemLotesQuery,
+  DfeListagemQuery,
+  DfeCancelamento,
+  DfeInutilizacao,
+  DfeListagem,
+  DfeLote,
+  DfeLoteListagem,
+  DfePedidoInutilizacao
+} from '../types/dfe';
 
 const BASE = '/nfe';
 
@@ -11,7 +21,7 @@ export class NFeService {
     this.httpClient = httpClient;
   }
 
-  async listar(params: NfeListagemQuery): Promise<DfeListagem> {
+  async listar(params: DfeListagemQuery): Promise<DfeListagem> {
     return await this.httpClient.get<DfeListagem>(BASE, {
       params: {
         $top: params.$top,
@@ -26,7 +36,7 @@ export class NFeService {
     });
   }
 
-  async listarLotes(params: NfeListagemLotesQuery): Promise<DfeLoteListagem> {
+  async listarLotes(params: DfeListagemLotesQuery): Promise<DfeLoteListagem> {
     return await this.httpClient.get<DfeLoteListagem>(`${BASE}/lotes`, {
       params: {
         $top: params.$top,

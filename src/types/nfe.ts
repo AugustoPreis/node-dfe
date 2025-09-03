@@ -1,25 +1,5 @@
 import { Ambiente } from './common';
 
-export interface NfeListagemQuery {
-  $top?: string;
-  $skip?: string;
-  $inlinecount?: boolean;
-  cpf_cnpj: string;
-  referencia?: string;
-  ambiente: Ambiente;
-  chave?: string;
-  serie?: string;
-}
-
-export interface NfeListagemLotesQuery {
-  $top?: string;
-  $skip?: string;
-  $inlinecount?: boolean;
-  cpf_cnpj: string;
-  referencia?: string;
-  ambiente: Ambiente;
-}
-
 export interface NfePedidoCancelamento {
   justificativa?: string;
 }

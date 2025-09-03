@@ -5,26 +5,6 @@ export type StatusNfse = 'processando' | 'autorizada' | 'negada' | 'cancelada' |
 export type StatusEventoNfse = 'pendente' | 'concluido' | 'rejeitado' | 'erro';
 export type StatusRpsLote = 'novo' | 'fila_envio' | 'fila_consulta' | 'processado' | 'erro';
 
-export interface NfseListagemQuery {
-  $top?: string;
-  $skip?: string;
-  $inlinecount?: boolean;
-  cpf_cnpj: string;
-  ambiente: Ambiente;
-  referencia?: string;
-  chave?: string;
-  serie?: string;
-}
-
-export interface NfseListagemLotesQuery {
-  $top?: string;
-  $skip?: string;
-  $inlinecount?: boolean;
-  cpf_cnpj: string;
-  ambiente: Ambiente;
-  referencia?: string;
-}
-
 export interface Nfse {
   id?: string;
   created_at?: string;
