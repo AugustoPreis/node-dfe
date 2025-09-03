@@ -1,7 +1,7 @@
 import { HttpClient } from '../core/httpClient';
-import { Dfe, DfeInutilizacao, DfeListagem, DfeLote, DfeLoteListagem, DfePedidoInutilizacao } from '../types/dfe';
+import { Dfe, DfeCancelamento, DfeInutilizacao, DfeListagem, DfeLote, DfeLoteListagem, DfePedidoInutilizacao } from '../types/dfe';
 import { DfeListagemLotesQuery, DfeListagemQuery } from '../types/dfe';
-import { NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
+import { NfePedidoCancelamento, NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
 
 const BASE = '/nfce';
 
@@ -34,6 +34,12 @@ export class NFCeService {
 
   async emitirLote(dados: NfePedidoEmissaoLote): Promise<DfeLote> {
     return await this.httpClient.post<DfeLote>(`${BASE}/lotes`, dados);
+  }
+
+  async cancelar(id: string, dados: NfePedidoCancelamento): Promise<DfeCancelamento> {
+    return await this.httpClient.post<DfeCancelamento>(`${BASE}/${id}/cancelamento`, {
+      justificativa: dados.justificativa,
+    });
   }
 
   async inutilizarSequencia(dados: DfePedidoInutilizacao): Promise<DfeInutilizacao> {
