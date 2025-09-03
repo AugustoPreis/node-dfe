@@ -4,6 +4,7 @@ import { NFCeService } from './services/nfce';
 import { CTeService } from './services/cte';
 import { MDFeService } from './services/mdfe';
 import { HttpClient } from './core/httpClient';
+import { CTeOsService } from './services/cte-os';
 import { Authenticator } from './core/authenticator';
 import { SdkConfig } from './types/common';
 
@@ -14,6 +15,7 @@ class NuvemFiscalApi {
   public nfce: NFCeService;
   public cte: CTeService;
   public mdfe: MDFeService;
+  public cteOs: CTeOsService;
 
   private httpClient: HttpClient;
 
@@ -30,6 +32,7 @@ class NuvemFiscalApi {
     this.nfce = new NFCeService(this.httpClient);
     this.cte = new CTeService(this.httpClient);
     this.mdfe = new MDFeService(this.httpClient);
+    this.cteOs = new CTeOsService(this.httpClient);
   }
 }
 
