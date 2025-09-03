@@ -1,17 +1,6 @@
 import { HttpClient } from '../core/httpClient';
-import {
-  NFeListagemParametros,
-  NFeListagemResultado,
-  NFeEmissaoParametros,
-  NFeConsultaResultado,
-  NFeInutilizarSequenciaParametros,
-  NFeInutilizarSequenciaResultado,
-  NFeListagemLotesParametros,
-  NFeListagemLotesResultado,
-  NFeConsultaLoteResultado,
-  NFeEmissaoLoteParametros,
-  NFeCancelamentoParametros,
-} from '../types/nfe';
+import { NfeListagemLotesQuery, NfeListagemQuery, NfePedidoCancelamento, NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
+import { Dfe, DfeCancelamento, DfeInutilizacao, DfeListagem, DfeLote, DfeLoteListagem, DfePedidoInutilizacao } from '../types/dfe';
 
 const BASE = '/nfe';
 
@@ -22,8 +11,8 @@ export class NFeService {
     this.httpClient = httpClient;
   }
 
-  async listar(params: NFeListagemParametros): Promise<NFeListagemResultado> {
-    return await this.httpClient.get<NFeListagemResultado>(BASE, {
+  async listar(params: NfeListagemQuery): Promise<DfeListagem> {
+    return await this.httpClient.get<DfeListagem>(BASE, {
       params: {
         $top: params.$top,
         $skip: params.$skip,
@@ -37,8 +26,8 @@ export class NFeService {
     });
   }
 
-  async listarLotes(params: NFeListagemLotesParametros): Promise<NFeListagemLotesResultado> {
-    return await this.httpClient.get<NFeListagemLotesResultado>(`${BASE}/lotes`, {
+  async listarLotes(params: NfeListagemLotesQuery): Promise<DfeLoteListagem> {
+    return await this.httpClient.get<DfeLoteListagem>(`${BASE}/lotes`, {
       params: {
         $top: params.$top,
         $skip: params.$skip,
@@ -50,30 +39,30 @@ export class NFeService {
     });
   }
 
-  async consultar(id: string): Promise<NFeConsultaResultado> {
-    return await this.httpClient.get<NFeConsultaResultado>(`${BASE}/${id}`);
+  async consultar(id: string): Promise<Dfe> {
+    return await this.httpClient.get<Dfe>(`${BASE}/${id}`);
   }
 
-  async consultarLote(id: string): Promise<NFeConsultaLoteResultado> {
-    return await this.httpClient.get<NFeConsultaLoteResultado>(`${BASE}/lotes/${id}`);
+  async consultarLote(id: string): Promise<DfeLote> {
+    return await this.httpClient.get<DfeLote>(`${BASE}/lotes/${id}`);
   }
 
-  async emitir(dados: NFeEmissaoParametros): Promise<NFeConsultaResultado> {
-    return await this.httpClient.post<NFeConsultaResultado>(`${BASE}`, dados);
+  async emitir(dados: NfePedidoEmissao): Promise<Dfe> {
+    return await this.httpClient.post<Dfe>(`${BASE}`, dados);
   }
 
-  async emitirLote(dados: NFeEmissaoLoteParametros): Promise<NFeConsultaLoteResultado> {
-    return await this.httpClient.post<NFeConsultaLoteResultado>(`${BASE}/lotes`, dados)
+  async emitirLote(dados: NfePedidoEmissaoLote): Promise<DfeLote> {
+    return await this.httpClient.post<DfeLote>(`${BASE}/lotes`, dados)
   }
 
-  async cancelar(dados: NFeCancelamentoParametros): Promise<NFeConsultaResultado> {
-    return await this.httpClient.post<NFeConsultaResultado>(`${BASE}/${dados.id}/cancelamento`, {
+  async cancelar(id: string, dados: NfePedidoCancelamento): Promise<DfeCancelamento> {
+    return await this.httpClient.post<DfeCancelamento>(`${BASE}/${id}/cancelamento`, {
       justificativa: dados.justificativa,
     });
   }
 
-  async inutilizarSequencia(dados: NFeInutilizarSequenciaParametros): Promise<NFeInutilizarSequenciaResultado> {
-    return await this.httpClient.post<NFeInutilizarSequenciaResultado>(`${BASE}/inutilizacoes`, dados);
+  async inutilizarSequencia(dados: DfePedidoInutilizacao): Promise<DfeInutilizacao> {
+    return await this.httpClient.post<DfeInutilizacao>(`${BASE}/inutilizacoes`, dados);
   }
 
   async baixarPDF(id: string): Promise<Buffer> {

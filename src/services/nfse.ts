@@ -1,16 +1,15 @@
 import { HttpClient } from '../core/httpClient';
 import {
-  CancelamentoResposta,
-  ConsultaCancelamentoResposta,
-  ConsultaLoteResposta,
-  ConsultaResposta,
-  ListagemLotesResposta,
-  ListagemResposta,
-  ParametrosCancelamento,
-  ParametrosEmissao,
-  ParametrosEmissaoLote,
-  ParametrosListagem,
-  ParametrosListagemLotes
+  Nfse,
+  NfseCancelamento,
+  NfseDpsPedidoEmissao,
+  NfseListagem,
+  NfseListagemLotesQuery,
+  NfseListagemQuery,
+  NfseLoteDpsPedidoEmissao,
+  NfsePedidoCancelamento,
+  RpsLote,
+  RpsLoteListagem
 } from '../types/nfse';
 
 const BASE = '/nfse';
@@ -22,8 +21,8 @@ export class NFSeService {
     this.httpClient = httpClient;
   }
 
-  async listar(params: ParametrosListagem): Promise<ListagemResposta> {
-    return await this.httpClient.get<ListagemResposta>(BASE, {
+  async listar(params: NfseListagemQuery): Promise<NfseListagem> {
+    return await this.httpClient.get<NfseListagem>(BASE, {
       params: {
         $top: params.$top,
         $skip: params.$skip,
@@ -37,8 +36,9 @@ export class NFSeService {
     });
   }
 
-  async listarLotes(params: ParametrosListagemLotes): Promise<ListagemLotesResposta> {
-    return await this.httpClient.get<ListagemLotesResposta>(`${BASE}/lotes`, {
+
+  async listarLotes(params: NfseListagemLotesQuery): Promise<RpsLoteListagem> {
+    return await this.httpClient.get<RpsLoteListagem>(`${BASE}/lotes`, {
       params: {
         $top: params.$top,
         $skip: params.$skip,
@@ -50,28 +50,28 @@ export class NFSeService {
     });
   }
 
-  async consultar(id: string): Promise<ConsultaResposta> {
-    return await this.httpClient.get<ConsultaResposta>(`${BASE}/${id}`);
+  async consultar(id: string): Promise<Nfse> {
+    return await this.httpClient.get<Nfse>(`${BASE}/${id}`);
   }
 
-  async consultarLote(id: string): Promise<ConsultaLoteResposta> {
-    return await this.httpClient.get<ConsultaLoteResposta>(`${BASE}/lotes/${id}`);
+  async consultarLote(id: string): Promise<RpsLote> {
+    return await this.httpClient.get<RpsLote>(`${BASE}/lotes/${id}`);
   }
 
-  async consultarCancelamento(id: string): Promise<ConsultaCancelamentoResposta> {
-    return await this.httpClient.get<ConsultaCancelamentoResposta>(`${BASE}/${id}/cancelamento`);
+  async consultarCancelamento(id: string): Promise<NfseCancelamento> {
+    return await this.httpClient.get<NfseCancelamento>(`${BASE}/${id}/cancelamento`);
   }
 
-  async emitir(dados: ParametrosEmissao): Promise<ConsultaResposta> {
-    return await this.httpClient.post<ConsultaResposta>(`${BASE}/dps`, dados);
+  async emitir(dados: NfseDpsPedidoEmissao): Promise<Nfse> {
+    return await this.httpClient.post<Nfse>(`${BASE}/dps`, dados);
   }
 
-  async emitirLote(dados: ParametrosEmissaoLote): Promise<ConsultaLoteResposta> {
-    return await this.httpClient.post<ConsultaLoteResposta>(`${BASE}/dps/lotes`, dados);
+  async emitirLote(dados: NfseLoteDpsPedidoEmissao): Promise<RpsLote> {
+    return await this.httpClient.post<RpsLote>(`${BASE}/dps/lotes`, dados);
   }
 
-  async cancelar(dados: ParametrosCancelamento): Promise<CancelamentoResposta> {
-    return await this.httpClient.post<CancelamentoResposta>(`${BASE}/${dados.id}/cancelamento`, {
+  async cancelar(id: string, dados: NfsePedidoCancelamento): Promise<NfseCancelamento> {
+    return await this.httpClient.post<NfseCancelamento>(`${BASE}/${id}/cancelamento`, {
       codigo: dados.codigo,
       motivo: dados.motivo,
     });

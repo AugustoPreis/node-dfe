@@ -1,10 +1,11 @@
 import { Ambiente, Provedor } from './common';
+import { Endereco, EnderecoSimples } from './endereco';
 
 export type StatusNfse = 'processando' | 'autorizada' | 'negada' | 'cancelada' | 'substituida' | 'erro';
-export type StatusCancelamentoNfse = 'pendente' | 'concluido' | 'rejeitado' | 'erro';
-export type StatusNfseLote = 'novo' | 'fila_envio' | 'fila_consulta' | 'processado' | 'erro';
+export type StatusEventoNfse = 'pendente' | 'concluido' | 'rejeitado' | 'erro';
+export type StatusRpsLote = 'novo' | 'fila_envio' | 'fila_consulta' | 'processado' | 'erro';
 
-export interface ParametrosListagem {
+export interface NfseListagemQuery {
   $top?: string;
   $skip?: string;
   $inlinecount?: boolean;
@@ -15,43 +16,7 @@ export interface ParametrosListagem {
   serie?: string;
 }
 
-export interface ListagemResposta {
-  '@count'?: number;
-  data: Array<{
-    id: string;
-    created_at: string;
-    status: StatusNfse;
-    numero: string;
-    codigo_verificacao: string;
-    link_url: string;
-    data_emissao: string | null;
-    ambiente: Ambiente;
-    referencia: string;
-    DPS: {
-      serie: string | null;
-      nDPS: string | null;
-    };
-    cancelamento: {
-      id: string;
-      status: StatusCancelamentoNfse;
-      codigo: string;
-      motivo: string;
-      data_hora: string | null;
-      mensagens: Array<{
-        codigo: string;
-        descricao: string;
-        correcao: string;
-      }>;
-    };
-    mensagens: Array<{
-      codigo: string;
-      descricao: string;
-      correcao: string;
-    }>;
-  }>;
-}
-
-export interface ParametrosListagemLotes {
+export interface NfseListagemLotesQuery {
   $top?: string;
   $skip?: string;
   $inlinecount?: boolean;
@@ -60,317 +25,348 @@ export interface ParametrosListagemLotes {
   referencia?: string;
 }
 
-export interface ListagemLotesResposta {
+export interface Nfse {
+  id?: string;
+  created_at?: string;
+  status?: StatusNfse;
+  numero?: string;
+  codigo_verificacao?: string;
+  link_url?: string;
+  data_emissao?: string;
+  ambiente?: Ambiente;
+  referencia?: string;
+  DPS?: DPS;
+  cancelamento?: NfseCancelamento;
+  mensagens?: NfseMensagemRetorno[];
+}
+
+export interface NfseCancelamento {
+  id?: string;
+  status?: StatusEventoNfse;
+  codigo?: string;
+  motivo?: string;
+  data_hora?: string;
+  mensagens?: NfseMensagemRetorno[];
+}
+
+export interface NfseDpsPedidoEmissao {
+  provedor?: Provedor;
+  ambiente: Ambiente;
+  referencia?: string;
+  infDPS: InfDPS;
+}
+
+export interface NfseListagem {
   '@count'?: number;
-  data: Array<{
-    id: string;
-    created_at: string;
-    status: StatusNfseLote;
-    numero: string;
-    ambiente: Ambiente;
-    referencia: string;
-    notas: ListagemResposta['data'];
-  }>;
+  data?: Nfse[];
 }
 
-export type ConsultaResposta = ListagemResposta['data'][0];
-export type ConsultaLoteResposta = ListagemLotesResposta['data'][0];
-export type ConsultaCancelamentoResposta = ConsultaResposta['cancelamento'];
-
-export interface ParametrosEmissao {
+export interface NfseLoteDpsPedidoEmissao {
   provedor?: Provedor;
   ambiente: Ambiente;
-  referencia?: string | null;
-  infDPS: {
-    tpAmb?: 1 | 2 | null;
-    dhEmi: string | null;
-    verAplic?: string | null;
-    dCompet?: string | null;
-    subst?: {
-      chSubstda: string | null;
-      cMotivo: '01' | '02' | '03' | '04' | '05' | '99' | null;
-      xMotivo?: string | null;
-    };
-    prest: {
-      CNPJ?: string | null;
-      CPF?: string | null;
-      regTrib?: {
-        regEspTrib?: number | null;
-      };
-    };
-    toma?: {
-      orgaoPublico?: boolean | null;
-      CNPJ?: string | null;
-      CPF?: string | null;
-      NIF?: string | null;
-      cNaoNIF?: 0 | 1 | 2 | null;
-      CAEPF?: string | null;
-      IM?: string | null;
-      IE?: string | null;
-      xNome: string | null;
-      end?: {
-        endNac?: {
-          cMun?: string | null;
-          CEP?: string | null;
-        };
-        endExt?: {
-          cPais: string | null;
-          cEndPost: string | null;
-          xCidade: string | null;
-          xEstProvReg: string | null;
-        };
-        xLgr?: string | null;
-        tpLgr?: string | null;
-        nro?: string | null;
-        xCpl?: string | null;
-        xBairro?: string | null;
-      };
-      fone?: string | null;
-      email?: string | null;
-    };
-    interm?: {
-      CNPJ?: string | null;
-      CPF?: string | null;
-      NIF?: string | null;
-      cNaoNIF?: 0 | 1 | 2 | null;
-      CAEPF?: string | null;
-      IM?: string | null;
-      IE?: string | null;
-      xNome: string | null;
-      end?: {
-        endNac?: {
-          cMun?: string | null;
-          CEP?: string | null;
-        };
-        endExt?: {
-          cPais: string | null;
-          cEndPost: string | null;
-          xCidade: string | null;
-          xEstProvReg: string | null;
-        };
-        xLgr?: string | null;
-        tpLgr?: string | null;
-        nro?: string | null;
-        xCpl?: string | null;
-        xBairro?: string | null;
-      };
-      fone?: string | null;
-      email?: string | null;
-    };
-    serv: {
-      locPrest?: {
-        cLocPrestacao?: string | null;
-        cPaisPrestacao?: string | null;
-      };
-      cServ: {
-        cTribNac: string | null;
-        cTribMun?: string | null;
-        CNAE?: string | null;
-        xDescServ: string | null;
-        cNBS?: string | null;
-        cNatOp?: string | null;
-        cSitTrib?: string | null;
-      };
-      comExt?: {
-        mdPrestacao: 0 | 1 | 2 | 3 | 4 | null;
-        vincPrest: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-        tpMoeda: string | null;
-        vServMoeda: string | null;
-        mecAFComexP: string | null;
-        mecAFComexT: string | null;
-        movTempBens: 0 | 1 | 2 | 3 | null;
-        nDI?: string | null;
-        nRE?: string | null;
-        mdic: 0 | 1 | null;
-      };
-      lsadppu?: {
-        categ: number | null;
-        objeto: number | null;
-        extensao: string | null;
-        nPostes: string | null;
-      };
-      obra?: {
-        cObra?: string | null;
-        inscImobFisc?: string | null;
-        end?: {
-          CEP?: string | null;
-          endExt?: {
-            cEndPost: string | null;
-            xCidade: string | null;
-            xEstProvReg: string | null;
-          };
-          xLgr: string | null;
-          tpLgr?: string | null;
-          nro: string | null;
-          xCpl?: string | null;
-          xBairro: string | null;
-        };
-      };
-      atvEvento?: {
-        xNome?: string | null;
-        dtIni: string | null;
-        dtFim: string | null;
-        idAtvEvt?: string | null;
-        end?: {
-          CEP?: string | null;
-          endExt?: {
-            cEndPost: string | null;
-            xCidade: string | null;
-            xEstProvReg: string | null;
-          };
-          xLgr: string | null;
-          tpLgr?: string | null;
-          nro: string | null;
-          xCpl?: string | null;
-          xBairro: string | null;
-        };
-      };
-      explRod?: {
-        categVeic: string | null;
-        nEixos: string | null;
-        rodagem: number | null;
-        sentido: string | null;
-        placa: string | null;
-        codAcessoPed: string | null;
-        codContrato: string | null;
-      };
-      infoCompl?: {
-        idDocTec?: string | null;
-        docRef?: string | null;
-        xInfComp?: string | null;
-      };
-    };
-    valores: {
-      vServPrest: {
-        vReceb?: number | null;
-        vServ: number | null;
-      };
-      vDescCondIncond?: {
-        vDescIncond?: number | null;
-        vDescCond?: number | null;
-      };
-      vDedRed?: {
-        pDR?: number | null;
-        vDR?: number | null;
-        documentos?: {
-          docDedRed: Array<{
-            chNFSe?: string | null;
-            chNFe?: string | null;
-            NFSeMun?: {
-              cMunNFSeMun: string | null;
-              nNFSeMun: number | null;
-              cVerifNFSeMun: string | null;
-            };
-            NFNFS?: {
-              nNFS: number | null;
-              modNFS: number | null;
-              serieNFS: string | null;
-            };
-            nDocFisc?: string | null;
-            nDoc?: string | null;
-            tpDedRed: number | null;
-            xDescOutDed?: string | null;
-            dtEmiDoc: string | null;
-            vDedutivelRedutivel: number | null;
-            vDeducaoReducao: number | null;
-            fornec: {
-              CNPJ?: string | null;
-              CPF?: string | null;
-              NIF?: string | null;
-              cNaoNIF?: 0 | 1 | 2 | null;
-              CAEPF?: string | null;
-              IM?: string | null;
-              IE?: string | null;
-              xNome: string | null;
-              end?: {
-                endNac?: {
-                  cMun?: string | null;
-                  CEP?: string | null;
-                };
-                endExt?: {
-                  cPais: string | null;
-                  cEndPost: string | null;
-                  xCidade: string | null;
-                  xEstProvReg: string | null;
-                };
-                xLgr?: string | null;
-                tpLgr?: string | null;
-                nro?: string | null;
-                xCpl?: string | null;
-                xBairro?: string | null;
-              };
-              fone?: string | null;
-              email?: string | null;
-            };
-          }>;
-        };
-      };
-      trib: {
-        tribMun: {
-          tribISSQN: 1 | 2 | 3 | 4 | null;
-          cLocIncid?: string | null;
-          cPaisResult?: string | null;
-          BM?: {
-            tpBM: number | null;
-            nBM: string | null;
-            vRedBCBM?: number | null;
-            pRedBCBM?: number | null;
-          };
-          exigSusp?: {
-            tpSusp: number | null;
-            nProcesso: string | null;
-          };
-          tpImunidade?: number | null;
-          vBC?: number | null;
-          pAliq?: number | null;
-          vISSQN?: number | null;
-          tpRetISSQN?: number | null;
-          vLiq?: number | null;
-        };
-        tribFed?: {
-          piscofins: {
-            CST: string | null;
-            vBCPisCofins?: number | null;
-            pAliqPis?: number | null;
-            pAliqCofins?: number | null;
-            vPis?: number | null;
-            vCofins?: number | null;
-            tpRetPisCofins?: 1 | 2;
-          };
-          vRetCP?: number | null;
-          vRetIRRF?: number | null;
-          vRetCSLL?: number | null;
-        };
-        totTrib?: {
-          vTotTrib: {
-            vTotTribFed: number | null;
-            vTotTribEst: number | null;
-            vTotTribMun: number | null;
-          };
-          pTotTrib: {
-            pTotTribFed: number | null;
-            pTotTribEst: number | null;
-            pTotTribMun: number | null;
-          };
-          indTotTrib?: number | null;
-          pTotTribSN?: number | null;
-        };
-      };
-    };
-  };
+  referencia?: string;
+  documentos?: NfseDpsPedidoEmissao[];
 }
 
-export interface ParametrosEmissaoLote {
-  provedor?: Provedor;
-  ambiente: Ambiente;
-  referencia?: string | null;
-  documentos: ParametrosEmissao[];
+export interface NfseMensagemRetorno {
+  codigo?: string;
+  descricao?: string;
+  correcao?: string;
 }
 
-export interface ParametrosCancelamento {
-  id: string;
+export interface NfsePedidoCancelamento {
   codigo?: string;
   motivo?: string;
 }
 
-export type CancelamentoResposta = ListagemResposta['data'][0]['cancelamento'];
+export interface InfDPS {
+  tpAmb?: number;
+  dhEmi: string;
+  verAplic?: string;
+  dCompet?: string;
+  subst?: Substituicao;
+  prest: InfoPrestador;
+  toma?: InfoTomador;
+  interm?: InfoIntermediario;
+  serv: Serv;
+  valores: InfoValores;
+}
+
+export interface Serv {
+  locPrest?: LocPrest;
+  cServ: CServ;
+  comExt?: ComExterior;
+  lsadppu?: LocacaoSublocacao;
+  obra?: InfoObra;
+  atvEvento?: AtvEvento;
+  explRod?: ExploracaoRodoviaria;
+  infoCompl?: InfoCompl;
+}
+
+export interface AtvEvento {
+  xNome?: string;
+  desc?: string;
+  dtIni: string;
+  dtFim: string;
+  idAtvEvt?: string;
+  id?: string;
+  end?: EnderecoSimples;
+}
+
+export interface Substituicao {
+  chSubstda: string;
+  cMotivo: string;
+  xMotivo?: string;
+}
+
+export interface InfoPrestador {
+  CNPJ?: string;
+  CPF?: string;
+  regTrib?: RegTrib;
+}
+
+export interface InfoTomador {
+  orgaoPublico?: boolean;
+  CNPJ?: string;
+  CPF?: string;
+  NIF?: string;
+  cNaoNIF?: number;
+  CAEPF?: string;
+  IM?: string;
+  IE?: string;
+  xNome: string;
+  end?: Endereco;
+  fone?: string;
+  email?: string;
+}
+
+export interface InfoValores {
+  vServPrest: VServPrest;
+  vDescCondIncond?: VDescCondIncond;
+  vDedRed?: InfoDedRed;
+  trib: InfoTributacao;
+}
+
+export interface RegTrib {
+  regEspTrib?: number;
+}
+
+export interface BeneficioMunicipal {
+  tpBM: number;
+  nBM: string;
+  vRedBCBM?: number;
+  pRedBCBM?: number;
+}
+
+export interface CServ {
+  cTribNac: string;
+  cTribMun?: string;
+  CNAE?: string;
+  xDescServ: string;
+  cNBS?: string;
+  cNatOp?: string;
+  cSitTrib?: string;
+}
+
+export interface ComExterior {
+  mdPrestacao: number;
+  vincPrest: number;
+  tpMoeda: string;
+  vServMoeda: number;
+  mecAFComexP: string;
+  mecAFComexT: string;
+  movTempBens: number;
+  nDI?: string;
+  nRE?: string;
+  mdic: number;
+}
+
+export interface DPS {
+  serie?: string;
+  nDPS?: string;
+}
+
+export interface DocDedRed {
+  chNFSe?: string;
+  chNFe?: string;
+  NFSeMun?: DocOutNFSe;
+  NFNFS?: DocNFNFS;
+  nDocFisc?: string;
+  nDoc?: string;
+  tpDedRed: number;
+  xDescOutDed?: string;
+  dtEmiDoc: string;
+  vDedutivelRedutivel: number;
+  vDeducaoReducao: number;
+  fornec?: InfoFornecDocDedRed;
+}
+
+export interface DocNFNFS {
+  nNFS: number;
+  modNFS: number;
+  serieNFS: string;
+}
+
+export interface DocOutNFSe {
+  cMunNFSeMun: string;
+  nNFSeMun: number;
+  cVerifNFSeMun: string;
+}
+
+export interface ExigSuspensa {
+  tpSusp: number;
+  nProcesso: string;
+}
+
+export interface ExploracaoRodoviaria {
+  categVeic: string;
+  nEixos: string;
+  rodagem: number;
+  sentido: string;
+  placa: string;
+  codAcessoPed: string;
+  codContrato: string;
+}
+
+export interface InfoCompl {
+  idDocTec?: string;
+  docRef?: string;
+  xInfComp?: string;
+}
+
+export interface InfoDedRed {
+  pDR?: number;
+  vDR?: number;
+  documentos?: ListaDocDedRed;
+}
+
+export interface InfoFornecDocDedRed {
+  CNPJ?: string;
+  CPF?: string;
+  NIF?: string;
+  cNaoNIF?: number;
+  CAEPF?: string;
+  IM?: string;
+  IE?: string;
+  xNome: string;
+  end?: Endereco;
+  fone?: string;
+  email?: string;
+}
+
+export interface InfoIntermediario {
+  CNPJ?: string;
+  CPF?: string;
+  NIF?: string;
+  cNaoNIF?: number;
+  CAEPF?: string;
+  IM?: string;
+  IE?: string;
+  xNome: string;
+  end?: Endereco;
+  fone?: string;
+  email?: string;
+}
+
+export interface InfoObra {
+  cObra?: string;
+  inscImobFisc?: string;
+  end?: EnderecoSimples;
+}
+
+export interface InfoTributacao {
+  tribMun: TribMunicipal;
+  tribFed?: TribFederal;
+  totTrib?: TribTotal;
+}
+
+export interface ListaDocDedRed {
+  docDedRed: DocDedRed[];
+}
+
+export interface LocPrest {
+  cLocPrestacao?: string;
+  cPaisPrestacao?: string;
+}
+
+export interface LocacaoSublocacao {
+  categ: number;
+  objeto: number;
+  extensao: string;
+  nPostes: string;
+}
+
+export interface TribFederal {
+  piscofins?: TribOutrosPisCofins;
+  vRetCP?: number;
+  vRetIRRF?: number;
+  vRetCSLL?: number;
+}
+
+export interface TribMunicipal {
+  tribISSQN: number;
+  cLocIncid?: string;
+  cPaisResult?: string;
+  BM?: BeneficioMunicipal;
+  exigSusp?: ExigSuspensa;
+  tpImunidade?: number;
+  vBC?: number;
+  pAliq?: number;
+  vISSQN?: number;
+  tpRetISSQN?: number;
+  vLiq?: number;
+}
+
+export interface TribOutrosPisCofins {
+  CST: string;
+  vBCPisCofins?: number;
+  pAliqPis?: number;
+  pAliqCofins?: number;
+  vPis?: number;
+  vCofins?: number;
+  tpRetPisCofins?: number;
+}
+
+export interface TribTotal {
+  vTotTrib?: TribTotalMonet;
+  pTotTrib?: TribTotalPercent;
+  indTotTrib?: number;
+  pTotTribSN?: number;
+}
+
+export interface TribTotalMonet {
+  vTotTribFed: number;
+  vTotTribEst: number;
+  vTotTribMun: number;
+}
+
+export interface TribTotalPercent {
+  pTotTribFed: number;
+  pTotTribEst: number;
+  pTotTribMun: number;
+}
+
+export interface VDescCondIncond {
+  vDescIncond?: number;
+  vDescCond?: number;
+}
+
+export interface VServPrest {
+  vReceb?: number;
+  vServ: number;
+}
+
+export interface RpsLote {
+  id?: string;
+  created_at?: string;
+  status?: StatusRpsLote;
+  numero?: string;
+  ambiente?: Ambiente;
+  referencia?: string;
+  notas?: Nfse[];
+}
+
+export interface RpsLoteListagem {
+  '@count'?: number;
+  data?: RpsLote[];
+}

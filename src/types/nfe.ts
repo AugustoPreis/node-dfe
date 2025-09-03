@@ -1,1573 +1,1417 @@
 import { Ambiente } from './common';
 
-export type StatusNfe = 'pendente' | 'autorizado' | 'rejeitado' | 'denegado' | 'encerrado' | 'cancelado' | 'erro';
-export type StatusEventoNfe = 'pendente' | 'registrado' | 'rejeitado' | 'erro';
-
-export interface NFeConsultaResultado {
-  id: string;
-  ambiente: Ambiente;
-  created_at: string;
-  status: StatusNfe;
-  referencia: string;
-  data_emissao: string;
-  modelo: number;
-  serie: number;
-  numero: number;
-  tipo_emissao: number;
-  valor_total: number;
-  chave: string;
-  autorizacao: {
-    digest_value: string;
-    id: string;
-    ambiente: Ambiente;
-    status: StatusEventoNfe;
-    autor: {
-      cpf_cnpj: string;
-    };
-    chave_acesso: string;
-    data_evento: string;
-    numero_sequencial: number;
-    data_recebimento: string;
-    codigo_status: number;
-    motivo_status: string;
-    numero_protocolo: number;
-    codigo_mensagem: number;
-    mensagem: string;
-    tipo_evento: string;
-  };
-}
-
-export interface NFeListagemParametros {
+export interface NfeListagemQuery {
   $top?: string;
   $skip?: string;
   $inlinecount?: boolean;
   cpf_cnpj: string;
-  ambiente: Ambiente;
   referencia?: string;
+  ambiente: Ambiente;
   chave?: string;
   serie?: string;
 }
 
-export interface NFeListagemResultado {
-  '@count'?: number;
-  data: Array<Omit<NFeConsultaResultado, 'numero' | 'serie'>>;
-}
-
-export type NFeListagemLotesParametros = Omit<NFeListagemParametros, 'chave' | 'serie'>;
-
-export interface NFeListagemLotesResultado {
-  '@count'?: number;
-  data: Array<{
-    id: string;
-    created_at: string;
-    status: 'pendente' | 'processado' | 'erro';
-    ambiente: Ambiente;
-    referencia: string;
-    id_lote: string | null;
-    recibo: {
-      numero: string;
-      codigo_status: number;
-      motivo_status: string;
-      data_recebimento: string;
-      codigo_mensagem: number;
-      mensagem: string;
-    };
-    documentos: NFeConsultaResultado[];
-  }>
-}
-
-export type NFeConsultaLoteResultado = NFeListagemLotesResultado['data'][0];
-
-export interface NFeInutilizarSequenciaParametros {
+export interface NfeListagemLotesQuery {
+  $top?: string;
+  $skip?: string;
+  $inlinecount?: boolean;
+  cpf_cnpj: string;
+  referencia?: string;
   ambiente: Ambiente;
-  cnpj: string
-  ano: number;
-  serie: number;
-  numero_inicial: number;
-  numero_final: number;
-  justificativa: string;
 }
 
-export interface NFeInutilizarSequenciaResultado {
-  cnpj: string;
-  ano: number;
-  modelo: number;
-  serie: number;
-  numero_inicial: number;
-  numero_final: number;
-  justificativa: string;
-  id: string;
+export interface NfePedidoCancelamento {
+  justificativa?: string;
+}
+
+export interface NfePedidoEmissao {
+  infNFe: NfeSefazInfNFe;
+  infNFeSupl?: NfeSefazInfNFeSupl;
   ambiente: Ambiente;
-  status: StatusEventoNfe;
-  autor: {
-    cpf_cnpj: string;
-  };
-  chave_acesso: string;
-  data_evento: string;
-  numero_sequencial: number;
-  data_recebimento: string | null;
-  codigo_status: number;
-  motivo_status: string;
-  numero_protocolo: string;
-  codigo_mensagem: number;
-  mensagem: string;
-  tipo_evento: string;
+  referencia?: string;
 }
 
-export interface NFeEmissaoLoteParametros {
-  documentos: NFeEmissaoParametros;
+export interface NfePedidoEmissaoLote {
+  documentos: NfePedidoEmissao[];
   ambiente: Ambiente;
   referencia?: string;
   id_lote: string;
 }
 
-export interface NFeCancelamentoParametros {
-  id: string;
-  justificativa?: string;
+export interface NfeSefazAdi {
+  nAdicao?: number;
+  nSeqAdic: number;
+  cFabricante: string;
+  vDescDI?: number;
+  nDraw?: string;
 }
 
-/*
-  Abaixo estão TODAS as interfaces utilizadas na emissão de NF-e,
-  caso for adicionar algo que não tenha relação com EMISSÃO, adicione antes desse comentário
-
-  Os campos estão divididos em diferentes interfaces, por conta de seu tamanho total.
-  Para nomear uma interface nova na EMISSÃO, utilize o seguinte padrão:
-
-    NFeTeste123: Nome do Pai
-    impostos: Nome da Propriedade
-
-    Nome da nova interface: NFeTeste123Impostos
-*/
-export interface NFeEmissaoParametros {
-  ambiente: Ambiente;
-  referencia?: string | null;
-  infNFe: NFeEmissaoInfNFe;
-  infNFeSupl?: NFeEmissaoInfNFeSupl;
+export interface NfeSefazAgropecuario {
+  defensivo?: NfeSefazDefensivo[];
+  guiaTransito?: NfeSefazGuiaTransito;
 }
 
-export interface NFeEmissaoInfNFeSupl {
-  qrCode?: string | null;
-  urlChave?: string | null;
+export interface NfeSefazArma {
+  tpArma: number;
+  nSerie: string;
+  nCano: string;
+  descr: string;
 }
 
-export interface NFeEmissaoInfNFe {
-  versao: string | null;
-  Id?: string | null;
-  ide: NFeEmissaoInfNFeIde;
-  emit: NFeEmissaoInfNFeEmit;
-  avulsa: NFeEmissaoInfNFeAvulsa;
-  dest?: NFeEmissaoInfNFeDest;
-  retirada?: NFeEmissaoInfNFeRetirada;
-  entrega?: NFeEmissaoInfNFeEntrega;
-  autXML?: NFeEmissaoInfNFeAutXML[];
-  det: NFeEmissaoInfNFeDet[];
-  total: NFeEmissaoInfNFeTotal;
-  transp: NFeEmissaoInfNFeTransp;
-  cobr?: NFeEmissaoInfNFeCobr;
-  pag: NFeEmissaoInfNFePag;
-  infIntermed?: NFeEmissaoInfNFeInfIntermed;
-  infAdic?: NFeEmissaoInfNFeInfAdic;
-  exporta?: NFeEmissaoInfNFeExporta;
-  compra?: NFeEmissaoInfNFeCompra;
-  cana?: NFeEmissaoInfNFeCana;
-  infRespTec?: NFeEmissaoInfNFeInfRespTec;
-  infSolicNFF?: NFeEmissaoInfNFeInfSolicNFF;
-  agropecuario?: NFeEmissaoInfNFeAgropecuario;
+export interface NfeSefazAutXML {
+  CNPJ?: string;
+  CPF?: string;
 }
 
-export interface NFeEmissaoInfNFeIde {
-  cUF: number | null;
-  cNF?: string | null;
-  natOp: string | null;
-  mod?: 55 | 65 | null;
-  serie: number | null;
-  nNF: number | null;
-  dhEmi: string | null;
-  dhSaiEnt?: string | null;
-  tpNF?: 0 | 1 | null;
-  idDest: 1 | 2 | 3 | null;
-  cMunFG: string | null;
-  cMunFGIBS?: string | null;
-  tpImp: 0 | 1 | 2 | 3 | 4 | 5 | null;
-  tpEmis: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 | null;
-  cDV?: number | null;
-  tpAmb?: 1 | 2 | null;
-  finNFe: 1 | 2 | 3 | 4 | 5 | 6 | null;
-  tpNFDebito?: '01' | '02' | '03' | '04' | '05' | null;
-  tpNFCredito?: string | null;
-  indFinal: 0 | 1 | null;
-  indPres: 0 | 1 | 2 | 3 | 4 | 5 | 9 | null;
-  indIntermed?: number | null;
-  procEmi: 0 | 1 | 2 | 3 | null;
-  verProc: string | null;
-  dhCont?: string | null;
-  xJust?: string | null;
-  NFref?: NFeEmissaoInfNFeIdeNFRef[];
-  gCompraGov?: NFeEmissaoInfNFeIdeGCompraGov;
-  gPagAntecipado?: NFeEmissaoInfNFeIdeGPagAntecipado;
+export interface NfeSefazAvulsa {
+  CNPJ: string;
+  xOrgao: string;
+  matr: string;
+  xAgente: string;
+  fone?: string;
+  UF: string;
+  nDAR?: string;
+  dEmi?: string;
+  vDAR?: number;
+  repEmi: string;
+  dPag?: string;
 }
 
-export interface NFeEmissaoInfNFeIdeNFRef {
-  refNFe?: string | null;
-  refNFeSig?: string | null;
-  refNF?: NFeEmissaoInfNFeIdeNFRefRefNF;
-  refNFP?: NFeEmissaoInfNFeIdeNFRefRefNFP;
-  refCTe?: string | null;
-  refECF?: NFeEmissaoInfNFeIdeNFRefRefECF;
+export interface NfeSefazCIBS {
+  vBC: number;
+  gIBSUF: NfeSefazGIBSUF;
+  gIBSMun: NfeSefazGIBSMun;
+  vIBS: number;
+  gCBS: NfeSefazGCBS;
+  gTribRegular?: NfeSefazTribRegular;
+  gIBSCredPres?: NfeSefazCredPres;
+  gCBSCredPres?: NfeSefazCredPres;
+  gTribCompraGov?: NfeSefazTribCompraGov;
 }
 
-export interface NFeEmissaoInfNFeIdeNFRefRefNF {
-  cUF: number | null;
-  AAMM: string | null;
-  CNPJ: string | null;
-  mod: string | null;
-  serie: number | null;
-  nNF: number | null;
+export interface NfeSefazCIDE {
+  qBCProd: number;
+  vAliqProd: number;
+  vCIDE: number;
 }
 
-export interface NFeEmissaoInfNFeIdeNFRefRefNFP {
-  cUF: number | null;
-  AAMM: string | null;
-  CNPJ?: string | null;
-  CPF?: string | null;
-  mod: string | null;
-  serie: number | null;
-  nNF: number | null;
+export interface NfeSefazCOFINS {
+  COFINSAliq?: NfeSefazCOFINSAliq;
+  COFINSQtde?: NfeSefazCOFINSQtde;
+  COFINSNT?: NfeSefazCOFINSNT;
+  COFINSOutr?: NfeSefazCOFINSOutr;
 }
 
-export interface NFeEmissaoInfNFeIdeNFRefRefECF {
-  mod: string | null;
-  nECF: number | null;
-  nCOO: number | null;
+export interface NfeSefazCOFINSAliq {
+  CST: string;
+  vBC: number;
+  pCOFINS: number;
+  vCOFINS: number;
 }
 
-export interface NFeEmissaoInfNFeIdeGCompraGov {
-  tpEnteGov: 1 | 2 | 3 | 4 | null;
-  pRedutor: number | null;
-  tpOperGov: 1 | 2 | null;
+export interface NfeSefazCOFINSNT {
+  CST: string;
 }
 
-export interface NFeEmissaoInfNFeIdeGPagAntecipado {
+export interface NfeSefazCOFINSOutr {
+  CST: string;
+  vBC?: number;
+  pCOFINS?: number;
+  qBCProd?: number;
+  vAliqProd?: number;
+  vCOFINS: number;
+}
+
+export interface NfeSefazCOFINSQtde {
+  CST: string;
+  qBCProd: number;
+  vAliqProd: number;
+  vCOFINS: number;
+}
+
+export interface NfeSefazCOFINSST {
+  vBC?: number;
+  pCOFINS?: number;
+  qBCProd?: number;
+  vAliqProd?: number;
+  vCOFINS: number;
+  indSomaCOFINSST?: number;
+}
+
+export interface NfeSefazCana {
+  safra: string;
+  ref: string;
+  forDia: NfeSefazForDia[];
+  qTotMes: number;
+  qTotAnt: number;
+  qTotGer: number;
+  deduc?: NfeSefazDeduc[];
+  vFor: number;
+  vTotDed: number;
+  vLiqFor: number;
+}
+
+export interface NfeSefazCard {
+  tpIntegra: number;
+  CNPJ?: string;
+  tBand?: string;
+  cAut?: string;
+  CNPJReceb?: string;
+  idTermPag?: string;
+}
+
+export interface NfeSefazCobr {
+  fat?: NfeSefazFat;
+  dup?: NfeSefazDup[];
+}
+
+export interface NfeSefazComb {
+  cProdANP: number;
+  descANP: string;
+  pGLP?: number;
+  pGNn?: number;
+  pGNi?: number;
+  vPart?: number;
+  CODIF?: string;
+  qTemp?: number;
+  UFCons: string;
+  CIDE?: NfeSefazCIDE;
+  encerrante?: NfeSefazEncerrante;
+  pBio?: number;
+  origComb?: NfeSefazOrigComb[];
+}
+
+export interface NfeSefazCompra {
+  xNEmp?: string;
+  xPed?: string;
+  xCont?: string;
+}
+
+export interface NfeSefazCompraGov {
+  tpEnteGov: number;
+  pRedutor: number;
+  tpOperGov: number;
+}
+
+export interface NfeSefazCredPres {
+  cCredPres: string;
+  pCredPres: number;
+  vCredPres?: number;
+  vCredPresCondSus?: number;
+}
+
+export interface NfeSefazCredPresIBSZFM {
+  tpCredPresIBSZFM: number;
+  vCredPresIBSZFM?: number;
+}
+
+export interface NfeSefazDFeReferenciado {
+  chaveAcesso: string;
+  nItem?: number;
+}
+
+export interface NfeSefazDI {
+  nDI: string;
+  dDI: string;
+  xLocDesemb: string;
+  UFDesemb: string;
+  dDesemb: string;
+  tpViaTransp: number;
+  vAFRMM?: number;
+  tpIntermedio: number;
+  CNPJ?: string;
+  CPF?: string;
+  UFTerceiro?: string;
+  cExportador: string;
+  adi: NfeSefazAdi[];
+}
+
+export interface NfeSefazDeduc {
+  xDed: string;
+  vDed: number;
+}
+
+export interface NfeSefazDefensivo {
+  nReceituario: string;
+  CPFRespTec: string;
+}
+
+export interface NfeSefazDest {
+  CNPJ?: string;
+  CPF?: string;
+  idEstrangeiro?: string;
+  xNome?: string;
+  enderDest?: NfeSefazEndereco;
+  indIEDest: number;
+  IE?: string;
+  ISUF?: string;
+  IM?: string;
+  email?: string;
+}
+
+export interface NfeSefazDet {
+  nItem: number;
+  prod: NfeSefazProd;
+  imposto: NfeSefazImposto;
+  impostoDevol?: NfeSefazImpostoDevol;
+  infAdProd?: string;
+  obsItem?: NfeSefazObsItem;
+  vItem?: number;
+  DFeReferenciado?: NfeSefazDFeReferenciado;
+}
+
+export interface NfeSefazDetExport {
+  nDraw?: string;
+  exportInd?: NfeSefazExportInd;
+}
+
+export interface NfeSefazDetPag {
+  indPag?: number;
+  tPag: string;
+  xPag?: string;
+  vPag: number;
+  dPag?: string;
+  CNPJPag?: string;
+  UFPag?: string;
+  card?: NfeSefazCard;
+}
+
+export interface NfeSefazDevTrib {
+  vDevTrib: number;
+}
+
+export interface NfeSefazDif {
+  pDif: number;
+  vDif: number;
+}
+
+export interface NfeSefazDup {
+  nDup?: string;
+  dVenc?: string;
+  vDup: number;
+}
+
+export interface NfeSefazEmit {
+  CNPJ?: string;
+  CPF?: string;
+  xNome?: string;
+  xFant?: string;
+  enderEmit?: NfeSefazEnderEmi;
+  IE?: string;
+  IEST?: string;
+  IM?: string;
+  CNAE?: string;
+  CRT?: number;
+}
+
+export interface NfeSefazEncerrante {
+  nBico: number;
+  nBomba?: number;
+  nTanque: number;
+  vEncIni: number;
+  vEncFin: number;
+}
+
+export interface NfeSefazEnderEmi {
+  xLgr?: string;
+  nro?: string;
+  xCpl?: string;
+  xBairro?: string;
+  cMun?: string;
+  xMun?: string;
+  UF?: string;
+  CEP?: string;
+  cPais?: string;
+  xPais?: string;
+  fone?: string;
+}
+
+export interface NfeSefazEndereco {
+  xLgr: string;
+  nro: string;
+  xCpl?: string;
+  xBairro: string;
+  cMun: string;
+  xMun: string;
+  UF: string;
+  CEP?: string;
+  cPais?: string;
+  xPais?: string;
+  fone?: string;
+}
+
+export interface NfeSefazExportInd {
+  nRE: string;
+  chNFe: string;
+  qExport: number;
+}
+
+export interface NfeSefazExporta {
+  UFSaidaPais: string;
+  xLocExporta: string;
+  xLocDespacho?: string;
+}
+
+export interface NfeSefazFat {
+  nFat?: string;
+  vOrig?: number;
+  vDesc?: number;
+  vLiq?: number;
+}
+
+export interface NfeSefazForDia {
+  dia: number;
+  qtde: number;
+}
+
+export interface NfeSefazGCBS {
+  pCBS: number;
+  gDif?: NfeSefazDif;
+  gDevTrib?: NfeSefazDevTrib;
+  gRed?: NfeSefazRed;
+  vCBS: number;
+}
+
+export interface NfeSefazGCred {
+  cCredPresumido: string;
+  pCredPresumido: number;
+  vCredPresumido: number;
+}
+
+export interface NfeSefazGIBS {
+  gIBSUF: NfeSefazGIBS_GIBSUF;
+  gIBSMun: NfeSefazGIBS_GIBSMun;
+  vIBS: number;
+  vCredPres: number;
+  vCredPresCondSus: number;
+}
+
+export interface NfeSefazGIBSMun {
+  pIBSMun: number;
+  gDif?: NfeSefazDif;
+  gDevTrib?: NfeSefazDevTrib;
+  gRed?: NfeSefazRed;
+  vIBSMun: number;
+}
+
+export interface NfeSefazGIBSUF {
+  pIBSUF: number;
+  gDif?: NfeSefazDif;
+  gDevTrib?: NfeSefazDevTrib;
+  gRed?: NfeSefazRed;
+  vIBSUF: number;
+}
+
+export interface NfeSefazGIBS_GIBSMun {
+  vDif: number;
+  vDevTrib: number;
+  vIBSMun: number;
+}
+
+export interface NfeSefazGIBS_GIBSUF {
+  vDif: number;
+  vDevTrib: number;
+  vIBSUF: number;
+}
+
+export interface NfeSefazGMono {
+  vIBSMono: number;
+  vCBSMono: number;
+  vIBSMonoReten: number;
+  vCBSMonoReten: number;
+  vIBSMonoRet: number;
+  vCBSMonoRet: number;
+}
+
+export interface NfeSefazGMonoDif {
+  pDifIBS: number;
+  vIBSMonoDif: number;
+  pDifCBS: number;
+  vCBSMonoDif: number;
+}
+
+export interface NfeSefazGMonoPadrao {
+  qBCMono: number;
+  adRemIBS: number;
+  adRemCBS: number;
+  vIBSMono: number;
+  vCBSMono: number;
+}
+
+export interface NfeSefazGMonoRet {
+  qBCMonoRet: number;
+  adRemIBSRet: number;
+  vIBSMonoRet: number;
+  adRemCBSRet: number;
+  vCBSMonoRet: number;
+}
+
+export interface NfeSefazGMonoReten {
+  qBCMonoReten: number;
+  adRemIBSReten: number;
+  vIBSMonoReten: number;
+  adRemCBSReten: number;
+  vCBSMonoReten: number;
+}
+
+export interface NfeSefazGPagAntecipado {
   refNFe: string[];
 }
 
-export interface NFeEmissaoInfNFeEmit {
-  CNPJ?: string | null;
-  CPF?: string | null;
-  xNome?: string | null;
-  xFant?: string | null;
-  enderEmit?: NFeEmissaoInfNFeEmitEnderEmit;
-  IE?: string | null;
-  IEST?: string | null;
-  IM?: string | null;
-  CNAE?: string | null;
-  CRT?: 1 | 2 | 3 | 4 | null;
+export interface NfeSefazGuiaTransito {
+  tpGuia: number;
+  UFGuia?: string;
+  serieGuia?: string;
+  nGuia: string;
 }
 
-export interface NFeEmissaoInfNFeEmitEnderEmit {
-  xLgr?: string | null;
-  nro?: string | null;
-  xCpl?: string | null;
-  xBairro?: string | null;
-  cMun?: string | null;
-  xMun?: string | null;
-  UF?: string | null;
-  CEP?: string | null;
-  cPais?: string | null;
-  xPais?: string | null;
-  fone?: string | null;
+export interface NfeSefazIBSCBSMonoTot {
+  vBCIBSCBS: number;
+  gIBS?: NfeSefazGIBS;
+  gCBS?: NfeSefazIBSCBSMonoTot_GCBS;
+  gMono?: NfeSefazGMono;
 }
 
-export interface NFeEmissaoInfNFeAvulsa {
-  CNPJ: string | null;
-  xOrgao: string | null;
-  matr: string | null;
-  xAgente: string | null;
-  fone?: string | null;
-  UF: string | null;
-  nDAR?: string | null;
-  dEmi?: string | null;
-  vDAR?: number | null;
-  repEmi: string | null;
-  dPag?: string | null;
+export interface NfeSefazIBSCBSMonoTot_GCBS {
+  vDif: number;
+  vDevTrib: number;
+  vCBS: number;
+  vCredPres: number;
+  vCredPresCondSus: number;
 }
 
-export interface NFeEmissaoInfNFeDest {
-  CNPJ?: string | null;
-  CPF?: string | null;
-  idEstrangeiro?: string | null;
-  xNome?: string | null;
-  enderDest?: NFeEmissaoInfNFeDestEnderDest;
-  indIEDest?: 1 | 2 | 9 | null;
-  IE?: string | null;
-  ISUF?: string | null;
-  IM?: string | null;
-  email?: string | null;
+export interface NfeSefazICMS {
+  ICMS00?: NfeSefazICMS00;
+  ICMS02?: NfeSefazICMS02;
+  ICMS10?: NfeSefazICMS10;
+  ICMS15?: NfeSefazICMS15;
+  ICMS20?: NfeSefazICMS20;
+  ICMS30?: NfeSefazICMS30;
+  ICMS40?: NfeSefazICMS40;
+  ICMS51?: NfeSefazICMS51;
+  ICMS53?: NfeSefazICMS53;
+  ICMS60?: NfeSefazICMS60;
+  ICMS61?: NfeSefazICMS61;
+  ICMS70?: NfeSefazICMS70;
+  ICMS90?: NfeSefazICMS90;
+  ICMSPart?: NfeSefazICMSPart;
+  ICMSST?: NfeSefazICMSST;
+  ICMSSN101?: NfeSefazICMSSN101;
+  ICMSSN102?: NfeSefazICMSSN102;
+  ICMSSN201?: NfeSefazICMSSN201;
+  ICMSSN202?: NfeSefazICMSSN202;
+  ICMSSN500?: NfeSefazICMSSN500;
+  ICMSSN900?: NfeSefazICMSSN900;
 }
 
-export interface NFeEmissaoInfNFeDestEnderDest {
-  xLrg: string | null;
-  nro: string | null;
-  xCPl?: string | null;
-  xBairro: string | null;
-  cMun: string | null;
-  xMun: string | null;
-  UF: string | null;
-  cPais?: string | null;
-  xPais?: string | null;
-  fone?: string | null;
+export interface NfeSefazICMS00 {
+  orig: number;
+  CST: string;
+  modBC: number;
+  vBC: number;
+  pICMS: number;
+  vICMS: number;
+  pFCP?: number;
+  vFCP?: number;
 }
 
-export interface NFeEmissaoInfNFeRetirada {
-  CNPJ?: string | null;
-  CPF?: string | null;
-  xNome?: string | null;
-  xLgr: string | null;
-  nro: string | null;
-  xCpl?: string | null;
-  xBairro: string | null;
-  cMun: string | null;
-  xMun: string | null;
-  UF: string | null;
-  CEP?: string | null;
-  cPais?: string | null;
-  xPais?: string | null;
-  fone?: string | null;
-  email?: string | null;
-  IE?: string | null;
+export interface NfeSefazICMS02 {
+  orig: number;
+  CST: string;
+  qBCMono?: number;
+  adRemICMS: number;
+  vICMSMono: number;
 }
 
-export interface NFeEmissaoInfNFeEntrega {
-  CNPJ?: string | null;
-  CPF?: string | null;
-  xNome?: string | null;
-  xLgr: string | null;
-  nro: string | null;
-  xCpl?: string | null;
-  xBairro: string | null;
-  cMun: string | null;
-  xMun: string | null;
-  UF: string | null;
-  CEP?: string | null;
-  cPais?: string | null;
-  xPais?: string | null;
-  fone?: string | null;
-  email?: string | null;
-  IE?: string | null;
+export interface NfeSefazICMS10 {
+  orig: number;
+  CST: string;
+  modBC: number;
+  vBC: number;
+  pICMS: number;
+  vICMS: number;
+  vBCFCP?: number;
+  pFCP?: number;
+  vFCP?: number;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  vICMSSTDeson?: number;
+  motDesICMSST?: number;
 }
 
-export interface NFeEmissaoInfNFeAutXML {
-  CNPJ?: string | null;
-  CPF?: string | null;
+export interface NfeSefazICMS15 {
+  orig: number;
+  CST: string;
+  qBCMono?: number;
+  adRemICMS: number;
+  vICMSMono: number;
+  qBCMonoReten?: number;
+  adRemICMSReten: number;
+  vICMSMonoReten: number;
+  pRedAdRem?: number;
+  motRedAdRem?: number;
 }
 
-export interface NFeEmissaoInfNFeDet {
-  nItem: number | null;
-  prod: NFeEmissaoInfNFeDetProd;
-  imposto: NFeEmissaoInfNFeDetImposto;
-  impostoDevol?: NFeEmissaoInfNFeDetImpostoDevol;
-  infAdProd?: string | null;
-  obsItem?: NFeEmissaoInfNFeDetObsItem;
-  vItem?: number | null;
-  DFeReferenciado?: NFeEmissaoInfNFeDetDFeReferenciado;
+export interface NfeSefazICMS20 {
+  orig: number;
+  CST: string;
+  modBC: number;
+  pRedBC: number;
+  vBC: number;
+  pICMS: number;
+  vICMS: number;
+  vBCFCP?: number;
+  pFCP?: number;
+  vFCP?: number;
+  vICMSDeson?: number;
+  motDesICMS?: number;
+  indDeduzDeson?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProd {
-  cProd: string | null;
-  cEAN: string | null;
-  cBarra?: string | null;
-  xProd: string | null;
-  NCM: string | null;
-  NVE?: string[];
-  CEST?: string | null;
-  indEscala?: string | null;
-  CNPJFab?: string | null;
-  cBenef?: string | null;
-  gCred?: NFeEmissaoInfNFeDetProdGCred[];
-  EXTIPI?: string | null;
-  CFOP: string | null;
-  uCom: string | null;
-  qCom: number | null;
-  vUnCom: number | null;
-  vProd: number | null;
-  cEANTrib: string | null;
-  cBarraTrib?: string | null;
-  uTrib: string | null;
-  qTrib: number | null;
-  vUnTrib: number | null;
-  vFrete?: number | null;
-  vSeg?: number | null;
-  vDesc?: number | null;
-  vOutro?: number | null;
-  indTot: 0 | 1 | null;
-  indBemMovelUsado?: number | null;
-  DI?: NFeEmissaoInfNFeDetProdDI[];
-  detExport?: NFeEmissaoInfNFeDetProdDetExport[];
-  xPed?: string | null;
-  nItemPed?: number | null;
-  nFCI?: string | null;
-  rastro?: NFeEmissaoInfNFeDetProdRastro[];
-  infProdNFF?: NFeEmissaoInfNFeDetProdInfProdNFF;
-  infProdEmb?: NFeEmissaoInfNFeDetProdInfProdEmb;
-  veicProd?: NFeEmissaoInfNFeDetProdVeicProd;
-  med?: NFeEmissaoInfNFeDetProdMed;
-  arma?: NFeEmissaoInfNFeDetProdArma[];
-  comb?: NFeEmissaoInfNFeDetProdComb;
-  nRECOPI?: string | null;
+export interface NfeSefazICMS30 {
+  orig: number;
+  CST: string;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  vICMSDeson?: number;
+  motDesICMS?: number;
+  indDeduzDeson?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdGCred {
-  cCredPresumido: string | null;
-  pCredPresumido: number | null;
-  vCredPresumido: number | null;
+export interface NfeSefazICMS40 {
+  orig: number;
+  CST: string;
+  vICMSDeson?: number;
+  motDesICMS?: number;
+  indDeduzDeson?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdDI {
-  nDI: string | null;
-  dDI: string | null;
-  xLocDesemb: string | null;
-  UFDesemb: string | null;
-  dDesemb: string | null;
-  tpViaTransp: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | null;
-  vAFRMM?: number | null;
-  tpIntermedio: 1 | 2 | 3 | null;
-  CNPJ?: string | null;
-  CPF?: string | null;
-  UFTerceiro?: string | null;
-  cExportador: string | null;
-  adi: NFeEmissaoInfNFeDetProdDIAdi[];
+export interface NfeSefazICMS51 {
+  orig: number;
+  CST: string;
+  modBC?: number;
+  pRedBC?: number;
+  cBenefRBC?: string;
+  vBC?: number;
+  pICMS?: number;
+  vICMSOp?: number;
+  pDif?: number;
+  vICMSDif?: number;
+  vICMS?: number;
+  vBCFCP?: number;
+  pFCP?: number;
+  vFCP?: number;
+  pFCPDif?: number;
+  vFCPDif?: number;
+  vFCPEfet?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdDIAdi {
-  nAdicao?: number | null;
-  nSeqAdic: number | null;
-  cFabricante: string | null;
-  vDescDI: number | null;
-  nDraw: string | null;
+export interface NfeSefazICMS53 {
+  orig: number;
+  CST: string;
+  qBCMono?: number;
+  adRemICMS?: number;
+  vICMSMonoOp?: number;
+  pDif?: number;
+  vICMSMonoDif?: number;
+  vICMSMono?: number;
+  qBCMonoDif?: number;
+  adRemICMSDif?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdDetExport {
-  nDraw?: string | null;
-  exportInd?: NFeEmissaoInfNFeDetProdDetExportExportInd;
+export interface NfeSefazICMS60 {
+  orig: number;
+  CST: string;
+  vBCSTRet?: number;
+  pST?: number;
+  vICMSSubstituto?: number;
+  vICMSSTRet?: number;
+  vBCFCPSTRet?: number;
+  pFCPSTRet?: number;
+  vFCPSTRet?: number;
+  pRedBCEfet?: number;
+  vBCEfet?: number;
+  pICMSEfet?: number;
+  vICMSEfet?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdDetExportExportInd {
-  nRE: string | null;
-  chNFe: string | null;
-  qExport: string | null;
+export interface NfeSefazICMS61 {
+  orig: number;
+  CST: string;
+  qBCMonoRet?: number;
+  adRemICMSRet: number;
+  vICMSMonoRet: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdRastro {
-  nLote: string | null;
-  qLote: number | null;
-  dFab: string | null;
-  dVal: string | null;
-  cAgreg?: string | null;
+export interface NfeSefazICMS70 {
+  orig: number;
+  CST: string;
+  modBC: number;
+  pRedBC: number;
+  vBC: number;
+  pICMS: number;
+  vICMS: number;
+  vBCFCP?: number;
+  pFCP?: number;
+  vFCP?: number;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  vICMSDeson?: number;
+  motDesICMS?: number;
+  indDeduzDeson?: number;
+  vICMSSTDeson?: number;
+  motDesICMSST?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdInfProdNFF {
-  cProdFisco: string | null;
-  cOperNFF: string | null;
+export interface NfeSefazICMS90 {
+  orig: number;
+  CST: string;
+  modBC?: number;
+  vBC?: number;
+  pRedBC?: number;
+  pICMS?: number;
+  vICMS?: number;
+  vBCFCP?: number;
+  pFCP?: number;
+  vFCP?: number;
+  modBCST?: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST?: number;
+  pICMSST?: number;
+  vICMSST?: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  vICMSDeson?: number;
+  motDesICMS?: number;
+  indDeduzDeson?: number;
+  vICMSSTDeson?: number;
+  motDesICMSST?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdInfProdEmb {
-  xEmb: string | null;
-  qVolEmb: number | null;
-  uEmb: string | null;
+export interface NfeSefazICMSPart {
+  orig: number;
+  CST: string;
+  modBC: number;
+  vBC: number;
+  pRedBC?: number;
+  pICMS: number;
+  vICMS: number;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  pBCOp: number;
+  UFST: string;
 }
 
-export interface NFeEmissaoInfNFeDetProdVeicProd {
-  tpOp: number | null;
-  chassi: string | null;
-  cCor: string | null;
-  xCor: string | null;
-  pot: string | null;
-  cilin: string | null;
-  pesoL: string | null;
-  pesoB: string | null;
-  nSerie: string | null;
-  tpComb: '02' | '03' | '16' | '17' | '18' | null;
-  nMotor: string | null;
-  CMT: string | null;
-  dist: string | null;
-  anoMod: number | null;
-  anoFab: number | null;
-  tpPint: string | null;
-  tpVeic: number | null;
-  espVeic: number | null;
-  VIN: 'R' | 'N' | null;
-  condVeic: 1 | 2 | 3 | null;
-  cMod: string | null;
-  cCorDenatran: '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | null;
-  lota: number | null;
-  tpRest: 0 | 1 | 2 | 3 | 4 | 9 | null;
+export interface NfeSefazICMSSN101 {
+  orig: number;
+  CSOSN: string;
+  pCredSN: number;
+  vCredICMSSN: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdMed {
-  cProdANVISA: string | null;
-  xMotivoIsencao: string | null;
-  vPMC: number | null;
+export interface NfeSefazICMSSN102 {
+  orig: number;
+  CSOSN: string;
 }
 
-export interface NFeEmissaoInfNFeDetProdArma {
-  tpArma: 0 | 1 | null;
-  nSerie: string | null;
-  nCano: string | null;
-  descr: string | null;
+export interface NfeSefazICMSSN201 {
+  orig: number;
+  CSOSN: string;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  pCredSN: number;
+  vCredICMSSN: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdComb {
-  cProdANP: number | null;
-  descANP: string | null;
-  pGLP?: number | null;
-  pGNn?: number | null;
-  pGNi?: number | null;
-  vPart?: number | null;
-  CODIF?: string | null;
-  qTemp?: number | null;
-  UFCons: string | null;
-  CIDE?: NFeEmissaoInfNFeDetProdCombCIDE;
-  encerrante?: NFeEmissaoInfNFeDetProdCombEncerrante;
-  pBio?: number | null;
-  origComb?: NFeEmissaoInfNFeDetProdCombOrigComb[];
+export interface NfeSefazICMSSN202 {
+  orig: number;
+  CSOSN: string;
+  modBCST: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST: number;
+  pICMSST: number;
+  vICMSST: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdCombCIDE {
-  qBCProd: number | null;
-  vAliqProd: number | null;
-  vCIDE: number | null;
+export interface NfeSefazICMSSN500 {
+  orig: number;
+  CSOSN: string;
+  vBCSTRet?: number;
+  pST?: number;
+  vICMSSubstituto?: number;
+  vICMSSTRet?: number;
+  vBCFCPSTRet?: number;
+  pFCPSTRet?: number;
+  vFCPSTRet?: number;
+  pRedBCEfet?: number;
+  vBCEfet?: number;
+  pICMSEfet?: number;
+  vICMSEfet?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdCombEncerrante {
-  nBico: number | null;
-  nBomba?: number | null;
-  nTanque: number | null;
-  vEncIni: number | null;
-  vEncFin: number | null;
+export interface NfeSefazICMSSN900 {
+  orig: number;
+  CSOSN: string;
+  modBC?: number;
+  vBC?: number;
+  pRedBC?: number;
+  pICMS?: number;
+  vICMS?: number;
+  modBCST?: number;
+  pMVAST?: number;
+  pRedBCST?: number;
+  vBCST?: number;
+  pICMSST?: number;
+  vICMSST?: number;
+  vBCFCPST?: number;
+  pFCPST?: number;
+  vFCPST?: number;
+  pCredSN?: number;
+  vCredICMSSN?: number;
 }
 
-export interface NFeEmissaoInfNFeDetProdCombOrigComb {
-  indImport: 0 | 1 | null;
+export interface NfeSefazICMSST {
+  orig: number;
+  CST: string;
+  vBCSTRet: number;
+  pST?: number;
+  vICMSSubstituto?: number;
+  vICMSSTRet: number;
+  vBCFCPSTRet?: number;
+  pFCPSTRet?: number;
+  vFCPSTRet?: number;
+  vBCSTDest: number;
+  vICMSSTDest: number;
+  pRedBCEfet?: number;
+  vBCEfet?: number;
+  pICMSEfet?: number;
+  vICMSEfet?: number;
+}
+
+export interface NfeSefazICMSTot {
+  vBC: number;
+  vICMS: number;
+  vICMSDeson: number;
+  vFCPUFDest?: number;
+  vICMSUFDest?: number;
+  vICMSUFRemet?: number;
+  vFCP: number;
+  vBCST: number;
+  vST: number;
+  vFCPST: number;
+  vFCPSTRet: number;
+  qBCMono?: number;
+  vICMSMono?: number;
+  qBCMonoReten?: number;
+  vICMSMonoReten?: number;
+  qBCMonoRet?: number;
+  vICMSMonoRet?: number;
+  vProd: number;
+  vFrete: number;
+  vSeg: number;
+  vDesc: number;
+  vII: number;
+  vIPI: number;
+  vIPIDevol: number;
+  vPIS: number;
+  vCOFINS: number;
+  vOutro: number;
+  vNF: number;
+  vTotTrib?: number;
+}
+
+export interface NfeSefazICMSUFDest {
+  vBCUFDest: number;
+  vBCFCPUFDest?: number;
+  pFCPUFDest?: number;
+  pICMSUFDest: number;
+  pICMSInter: number;
+  pICMSInterPart: number;
+  vFCPUFDest?: number;
+  vICMSUFDest: number;
+  vICMSUFRemet: number;
+}
+
+export interface NfeSefazII {
+  vBC: number;
+  vDespAdu: number;
+  vII: number;
+  vIOF: number;
+}
+
+export interface NfeSefazIPINT {
+  CST: string;
+}
+
+export interface NfeSefazIPITrib {
+  CST: string;
+  vBC?: number;
+  pIPI?: number;
+  qUnid?: number;
+  vUnid?: number;
+  vIPI: number;
+}
+
+export interface NfeSefazIS {
+  CSTIS: string;
+  cClassTribIS?: string;
+  vBCIS?: number;
+  pIS?: number;
+  pISEspec?: number;
+  uTrib?: string;
+  qTrib?: number;
+  vIS?: number;
+}
+
+export interface NfeSefazISSQN {
+  vBC: number;
+  vAliq: number;
+  vISSQN: number;
+  cMunFG: string;
+  cListServ: string;
+  vDeducao?: number;
+  vOutro?: number;
+  vDescIncond?: number;
+  vDescCond?: number;
+  vISSRet?: number;
+  indISS: number;
+  cServico?: string;
+  cMun?: string;
+  cPais?: string;
+  nProcesso?: string;
+  indIncentivo: number;
+}
+
+export interface NfeSefazISSQNtot {
+  vServ?: number;
+  vBC?: number;
+  vISS?: number;
+  vPIS?: number;
+  vCOFINS?: number;
+  dCompet: string;
+  vDeducao?: number;
+  vOutro?: number;
+  vDescIncond?: number;
+  vDescCond?: number;
+  vISSRet?: number;
+  cRegTrib?: number;
+}
+
+export interface NfeSefazISTot {
+  vIS: number;
+}
+
+export interface NfeSefazIde {
+  cUF: number;
+  cNF?: string;
+  natOp: string;
+  mod?: number;
+  serie: number;
+  nNF: number;
+  dhEmi: string;
+  dhSaiEnt?: string;
+  tpNF: number;
+  idDest: number;
+  cMunFG: string;
+  cMunFGIBS?: string;
+  tpImp: number;
+  tpEmis: number;
+  cDV?: number;
+  tpAmb?: number;
+  finNFe: number;
+  tpNFDebito?: string;
+  tpNFCredito?: string;
+  indFinal: number;
+  indPres: number;
+  indIntermed?: number;
+  procEmi: number;
+  verProc: string;
+  dhCont?: string;
+  xJust?: string;
+  NFref?: NfeSefazNFref[];
+  gCompraGov?: NfeSefazCompraGov;
+  gPagAntecipado?: NfeSefazGPagAntecipado;
+}
+
+export interface NfeSefazImposto {
+  vTotTrib?: number;
+  ICMS?: NfeSefazICMS;
+  IPI?: NfeSefazIpi;
+  II?: NfeSefazII;
+  ISSQN?: NfeSefazISSQN;
+  PIS?: NfeSefazPIS;
+  PISST?: NfeSefazPISST;
+  COFINS?: NfeSefazCOFINS;
+  COFINSST?: NfeSefazCOFINSST;
+  ICMSUFDest?: NfeSefazICMSUFDest;
+  IS?: NfeSefazIS;
+  IBSCBS?: NfeSefazTribNFe;
+}
+
+export interface NfeSefazImpostoDevol {
+  pDevol: number;
+  IPI: NfeSefazImpostoDevol_IPI;
+}
+
+export interface NfeSefazImpostoDevol_IPI {
+  vIPIDevol: number;
+}
+
+export interface NfeSefazInfAdic {
+  infAdFisco?: string;
+  infCpl?: string;
+  obsCont?: NfeSefazInfAdic_ObsCont[];
+  obsFisco?: NfeSefazInfAdic_ObsFisco[];
+  procRef?: NfeSefazProcRef[];
+}
+
+export interface NfeSefazInfAdic_ObsCont {
+  xCampo?: string;
+  xTexto?: string;
+}
+
+export interface NfeSefazInfAdic_ObsFisco {
+  xCampo?: string;
+  xTexto?: string;
+}
+
+export interface NfeSefazInfIntermed {
+  CNPJ: string;
+  idCadIntTran: string;
+}
+
+export interface NfeSefazInfNFe {
+  versao: string;
+  Id?: string;
+  ide: NfeSefazIde;
+  emit: NfeSefazEmit;
+  avulsa?: NfeSefazAvulsa;
+  dest?: NfeSefazDest;
+  retirada?: NfeSefazLocal;
+  entrega?: NfeSefazLocal;
+  autXML?: NfeSefazAutXML[];
+  det: NfeSefazDet[];
+  total: NfeSefazTotal;
+  transp: NfeSefazTransp;
+  cobr?: NfeSefazCobr;
+  pag: NfeSefazPag;
+  infIntermed?: NfeSefazInfIntermed;
+  infAdic?: NfeSefazInfAdic;
+  exporta?: NfeSefazExporta;
+  compra?: NfeSefazCompra;
+  cana?: NfeSefazCana;
+  infRespTec?: NfeSefazInfRespTec;
+  infSolicNFF?: NfeSefazInfSolicNFF;
+  agropecuario?: NfeSefazAgropecuario;
+}
+
+export interface NfeSefazInfNFeSupl {
+  qrCode?: string;
+  urlChave?: string;
+}
+
+export interface NfeSefazInfProdEmb {
+  xEmb: string;
+  qVolEmb: number;
+  uEmb: string;
+}
+
+export interface NfeSefazInfProdNFF {
+  cProdFisco: string;
+  cOperNFF: string;
+}
+
+export interface NfeSefazInfRespTec {
+  CNPJ: string;
+  xContato: string;
+  email: string;
+  fone: string;
+  idCSRT?: number;
+  CSRT?: string;
+  hashCSRT?: string;
+}
+
+export interface NfeSefazInfSolicNFF {
+  xSolic: string;
+}
+
+export interface NfeSefazIpi {
+  CNPJProd?: string;
+  cSelo?: string;
+  qSelo?: number;
+  cEnq: string;
+  IPITrib?: NfeSefazIPITrib;
+  IPINT?: NfeSefazIPINT;
+}
+
+export interface NfeSefazLacres {
+  nLacre: string;
+}
+
+export interface NfeSefazLocal {
+  CNPJ?: string;
+  CPF?: string;
+  xNome?: string;
+  xLgr: string;
+  nro: string;
+  xCpl?: string;
+  xBairro: string;
+  cMun: string;
+  xMun: string;
+  UF: string;
+  CEP?: string;
+  cPais?: string;
+  xPais?: string;
+  fone?: string;
+  email?: string;
+  IE?: string;
+}
+
+export interface NfeSefazMed {
+  cProdANVISA: string;
+  xMotivoIsencao?: string;
+  vPMC: number;
+}
+
+export interface NfeSefazMonofasia {
+  gMonoPadrao?: NfeSefazGMonoPadrao;
+  gMonoReten?: NfeSefazGMonoReten;
+  gMonoRet?: NfeSefazGMonoRet;
+  gMonoDif?: NfeSefazGMonoDif;
+  vTotIBSMonoItem: number;
+  vTotCBSMonoItem: number;
+}
+
+export interface NfeSefazNFref {
+  refNFe?: string;
+  refNFeSig?: string;
+  refNF?: NfeSefazRefNF;
+  refNFP?: NfeSefazRefNFP;
+  refCTe?: string;
+  refECF?: NfeSefazRefECF;
+}
+
+export interface NfeSefazObsCont {
+  xCampo?: string;
+  xTexto?: string;
+}
+
+export interface NfeSefazObsFisco {
+  xCampo?: string;
+  xTexto?: string;
+}
+
+export interface NfeSefazObsItem {
+  obsCont?: NfeSefazObsCont;
+  obsFisco?: NfeSefazObsFisco;
+}
+
+export interface NfeSefazOrigComb {
+  indImport: number;
   cUFOrig: number;
   pOrig: number;
 }
 
-export interface NFeEmissaoInfNFeDetImposto {
-  vTotTrib?: number | null;
-  ICMS?: NFeEmissaoInfNFeDetImpostoICMS;
-  IPI?: NFeEmissaoInfNFeDetImpostoIPI;
-  II?: NFeEmissaoInfNFeDetImpostoII;
-  ISSQN?: NFeEmissaoInfNFeDetImpostoISSQN;
-  PIS?: NFeEmissaoInfNFeDetImpostoPIS;
-  PISST?: NFeEmissaoInfNFeDetImpostoPISST;
-  COFINS?: NFeEmissaoInfNFeDetImpostoCOFINS;
-  COFINSST?: NFeEmissaoInfNFeDetImpostoCOFINSST;
-  ICMSUFDest?: NFeEmissaoInfNFeDetImpostoICMSUFDest;
-  IS?: NFeEmissaoInfNFeDetImpostoIS;
-  IBSCBS?: NFeEmissaoInfNFeDetImpostoIBSCBS;
+export interface NfeSefazPIS {
+  PISAliq?: NfeSefazPISAliq;
+  PISQtde?: NfeSefazPISQtde;
+  PISNT?: NfeSefazPISNT;
+  PISOutr?: NfeSefazPISOutr;
 }
 
-export interface NFeEmissaoInfNFeDetImpostoICMS {
-  ICMS00?: NFeEmissaoInfNFeDetImpostoICMS00;
-  ICMS02?: NFeEmissaoInfNFeDetImpostoICMS02;
-  ICMS10?: NFeEmissaoInfNFeDetImpostoICMS10;
-  ICMS15?: NFeEmissaoInfNFeDetImpostoICMS15;
-  ICMS20?: NFeEmissaoInfNFeDetImpostoICMS20;
-  ICMS30?: NFeEmissaoInfNFeDetImpostoICMS30;
-  ICMS40?: NFeEmissaoInfNFeDetImpostoICMS40;
-  ICMS51?: NFeEmissaoInfNFeDetImpostoICMS51;
-  ICMS53?: NFeEmissaoInfNFeDetImpostoICMS53;
-  ICMS60?: NFeEmissaoInfNFeDetImpostoICMS60;
-  ICMS61?: NFeEmissaoInfNFeDetImpostoICMS61;
-  ICMS70?: NFeEmissaoInfNFeDetImpostoICMS70;
-  ICMS90?: NFeEmissaoInfNFeDetImpostoICMS90;
-  ICMSPart?: NFeEmissaoInfNFeDetImpostoICMSPart;
-  ICMSST?: NFeEmissaoInfNFeDetImpostoICMSST;
-  ICMSSN101?: NFeEmissaoInfNFeDetImpostoICMSSN101;
-  ICMSSN102?: NFeEmissaoInfNFeDetImpostoICMSSN102;
-  ICMSSN201?: NFeEmissaoInfNFeDetImpostoICMSSN201;
-  ICMSSN202?: NFeEmissaoInfNFeDetImpostoICMSSN202;
-  ICMSSN500?: NFeEmissaoInfNFeDetImpostoICMSSN500;
-  ICMSSN900?: NFeEmissaoInfNFeDetImpostoICMSSN900;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS00 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '00' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  vBC: number | null;
-  pICMS: number | null;
-  vICMS: number | null;
-  pFCP?: number | null;
-  vFCP?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS02 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '02' | null;
-  qBCMono?: number | null;
-  adRemICMS: number | null;
-  vICMSMono: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS10 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '10' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  vBC: number | null;
-  pICMS: number | null;
-  vICMS: number | null;
-  vBCFCP?: number | null;
-  pFCP?: number | null;
-  modBCST?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  vICMSSTDeson?: number | null;
-  motDesICMSST?: 9 | 12 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS15 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '15';
-  qBCMono?: number | null;
-  adRemICMS: number | null;
-  vICMSMono: number | null;
-  qBCMonoReten?: number | null;
-  adRemICMSReten: number | null;
-  vICMSMonoReten: number | null;
-  pRedAdRem?: number | null;
-  motRedAdRem?: 1 | 9 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS20 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '20' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  pRedBC: number | null;
-  vBC: number | null;
-  pICMS: number | null;
-  vICMS: number | null;
-  vBCFCP?: number | null;
-  pFCP?: number | null;
-  vFCP?: number | null;
-  vICMSDeson?: number | null;
-  motDesICMS?: 9 | 12 | null;
-  indDeduzDeson?: 0 | 1 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS30 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '30' | null;
-  modBCST: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  vICMSDeson?: number | null;
-  motDesICMS?: 7 | 9 | null;
-  indDeduzDeson?: 0 | 1 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS40 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '40' | null;
-  vICMSDeson?: number | null;
-  motDesICMS?: 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 16 | 90 | null;
-  indDeduzDeson?: 0 | 1 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS51 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '51' | null;
-  modBC?: 0 | 1 | 2 | 3 | null;
-  pRedBC?: number | null;
-  cBenefRBC?: string | null;
-  vBC?: number | null;
-  pICMS?: number | null;
-  vICMSOp?: number | null;
-  pDif?: number | null;
-  vICMSDif?: number | null;
-  vICMS?: number | null;
-  vBCFCP?: number | null;
-  pFCP?: number | null;
-  vFCP?: number | null;
-  pFCPDif?: number | null;
-  vFCPDif?: number | null;
-  vFCPEfet?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS53 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '53' | null;
-  qBCMono?: number | null;
-  adRemICMS?: number | null;
-  vICMSMonoOp?: number | null;
-  pDif?: number | null;
-  vICMSMonoDif?: number | null;
-  vICMSMono?: number | null;
-  qBCMonoDif?: number | null;
-  adRemICMSDif?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS60 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '60' | null;
-  vBCSTRet?: number | null;
-  pST?: number | null;
-  vICMSSubstituto?: number | null;
-  vICMSSTRet?: number | null;
-  vBCFCPSTRet?: number | null;
-  pFCPSTRet?: number | null;
-  vFCPSTRet?: number | null;
-  pRedBCEfet?: number | null;
-  vBCEfet?: number | null;
-  pICMSEfet?: number | null;
-  vICMSEfet?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS61 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '61' | null;
-  qBCMonoRet?: number | null;
-  adRemICMSRet: number | null;
-  vICMSMonoRet: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS70 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '70' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  pRedBC: number | null;
-  vBC: number | null;
-  pICMS: number | null;
-  vICMS: number | null;
-  vBCFCP?: number | null;
-  pFCP?: number | null;
-  vFCP?: number | null;
-  modBCST?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  vICMSDeson?: number | null;
-  motDesICMS?: 9 | 12 | null;
-  indDeduzDeson?: 0 | 1 | null;
-  vICMSSTDeson?: number | null;
-  motDesICMSST?: 9 | 12 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMS90 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '90' | null;
-  modBC?: 0 | 1 | 2 | 3 | null;
-  vBC?: number | null;
-  pRedBC?: number | null;
-  pICMS?: number | null;
-  vICMS?: number | null;
-  vBCFCP?: number | null;
-  pFCP?: number | null;
-  vFCP?: number | null;
-  modBCST?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST?: number | null;
-  pICMSST?: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  vICMSDeson?: number | null;
-  motDesICMS?: 9 | 12 | null;
-  indDeduzDeson?: 0 | 1 | null;
-  vICMSSTDeson?: number | null;
-  motDesICMSST?: 9 | 12 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSPart {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '10' | '90' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  vBC: number | null;
-  pRedBC?: number | null;
-  pICMS: number | null;
-  vICMS: number | null;
-  modBCST: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  vBCST?: number | null;
-  pRedBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  pBCOp: number | null;
-  UFST: string | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSST {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CST: '41' | '60' | null;
-  vBCSTRet: number | null;
-  pST?: number | null;
-  vICMSSubstituto?: number | null;
-  vICMSSTRet: number | null;
-  vBCFCPSTRet?: number | null;
-  pFCPSTRet?: number | null;
-  vFCPSTRet?: number | null;
-  vBCSTDest: number | null;
-  vICMSSTDest: number | null;
-  pRedBCEfet?: number | null;
-  vBCEfet?: number | null;
-  pICMSEfet?: number | null;
-  vICMSEfet?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN101 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '101' | null;
-  pCredSN: number | null;
-  vCredICMSSN: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN102 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '102' | '103' | '300' | '400' | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN201 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '201' | null;
-  modBCST: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  pCredSN: number | null;
-  vCredICMSSN: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN202 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '202' | '203' | null;
-  modBCST: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST: number | null;
-  pICMSST: number | null;
-  vICMSST: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN500 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '500' | null;
-  vBCSTRet?: number | null;
-  pST?: number | null;
-  vICMSSubstituto?: number | null;
-  vICMSSTRet?: number | null;
-  vBCFCPSTRet?: number | null;
-  pFCPSTRet?: number | null;
-  vFCPSTRet?: number | null;
-  pRedBCEfet?: number | null;
-  vBCEfet?: number | null;
-  pICMSEfet?: number | null;
-  vICMSEfet?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSSN900 {
-  orig: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
-  CSOSN: '900' | null;
-  modBC: 0 | 1 | 2 | 3 | null;
-  vBC?: number | null;
-  pRedBC?: number | null;
-  pICMS?: number | null;
-  vICMS?: number | null;
-  modBCST?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
-  pMVAST?: number | null;
-  pRedBCST?: number | null;
-  vBCST?: number | null;
-  pICMSST?: number | null;
-  vICMSST?: number | null;
-  vBCFCPST?: number | null;
-  pFCPST?: number | null;
-  vFCPST?: number | null;
-  pCredSN?: number | null;
-  vCredICMSSN?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIPI {
-  CNPJProd?: string | null;
-  cSelo?: string | null;
-  qSelo?: string | null;
-  cEnq: string | null;
-  IPITrib?: NFeEmissaoInfNFeDetImpostoIPIIPITrib;
-  IPINT?: NFeEmissaoInfNFeDetImpostoIPIIPINT;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIPIIPITrib {
-  CST: '00' | '49' | '50' | '99';
-  vBC?: number | null;
-  pIPI?: number | null;
-  qUnid?: number | null;
-  vUnid?: number | null;
-  vIPI: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIPIIPINT {
-  CST: '01' | '02' | '03' | '04' | '05' | '51' | '52' | '53' | '54' | '55';
-}
-
-export interface NFeEmissaoInfNFeDetImpostoII {
-  vBC: number | null;
-  vDespAdu: number | null;
-  vII: number | null;
-  vIOF: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoISSQN {
-  vBC: number | null;
-  vAliq: number | null;
-  vISSQN: number | null;
-  cMunFG: string | null;
-  cListServ: string | null;
-  vDeducao?: number | null;
-  vOutro?: number | null;
-  vDescIncond?: number | null;
-  vDescCond?: number | null;
-  vISSRet?: number | null;
-  indISS: 2 | 3 | 4 | 5 | 6 | 7 | null;
-  cServico?: string | null;
-  cMun?: string | null;
-  cPais?: string | null;
-  nProcesso?: string | null;
-  indIncentivo: 2 | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoPIS {
-  PISAliq?: NFeEmissaoInfNFeDetImpostoPISPISAliq;
-  PISQtde?: NFeEmissaoInfNFeDetImpostoPISPISQtde;
-  PISNT?: NFeEmissaoInfNFeDetImpostoPISPISNT;
-  PISOutr?: NFeEmissaoInfNFeDetImpostoPISPISOutr;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoPISPISAliq {
-  CST: '01' | '02' | null;
+export interface NfeSefazPISAliq {
+  CST: string;
   vBC: number;
   pPIS: number;
   vPIS: number;
 }
 
-export interface NFeEmissaoInfNFeDetImpostoPISPISQtde {
-  CST: '03' | null;
-  qBCProd: number | null;
-  vAliqProd: number | null;
-  vPIS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoPISPISNT {
-  CST: '04' | '05' | '06' | '07' | '08' | '09';
-}
-
-export interface NFeEmissaoInfNFeDetImpostoPISPISOutr {
-  CST: '99' | null;
-  vBC?: number | null;
-  pPIS?: number | null;
-  qBCProd?: number | null;
-  vAliqProd?: number | null;
-  vPIS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoPISST {
-  vBC?: number | null;
-  pPIS?: number | null;
-  qBCProd?: number | null;
-  vAliqProd?: number | null;
-  vPIS: number | null;
-  indSomaPISST?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINS {
-  COFINSAliq?: NFeEmissaoInfNFeDetImpostoCOFINSCOFINSAliq;
-  COFINSQtde?: NFeEmissaoInfNFeDetImpostoCOFINSCOFINSQtde;
-  COFINSNT?: NFeEmissaoInfNFeDetImpostoCOFINSCOFINSNT;
-  COFINSOutr?: NFeEmissaoInfNFeDetImpostoCOFINSCOFINSOutr;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINSCOFINSAliq {
-  CST: '01' | '02' | null;
-  vBC: number | null;
-  pCOFINS: number | null;
-  vCOFINS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINSCOFINSQtde {
-  CST: '03' | null;
-  qBCProd: number | null;
-  vAliqProd: number | null;
-  vCOFINS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINSCOFINSNT {
-  CST: '04' | '05' | '06' | '07' | '08' | '09' | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINSCOFINSOutr {
-  CST: '49' | '50' | '51' | '52' | '53' | '54' | '55' | '56' | '60' | '61' | '62' | '63' | '64' | '65' | '66' | '67' | '70' | '71' | '72' | '73' | '74' | '75' | '98' | '99';
-  vBC?: number | null;
-  pCOFINS?: number | null;
-  qBCProd?: number | null;
-  vAliqProd?: number | null;
-  vCOFINS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoCOFINSST {
-  vBC?: number | null;
-  pCOFINS?: number | null;
-  qBCProd?: number | null;
-  vAliqProd?: number | null;
-  vCOFINS: number | null;
-  indSomaCOFINSST?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoICMSUFDest {
-  vBCUFDest: number | null;
-  vBCFCPUFDest?: number | null;
-  pFCPUFDest?: number | null;
-  pICMSUFDest: number | null;
-  pICMSInter: 4 | 7 | 12 | null;
-  pICMSInterPart: 40 | 60 | 80 | 100 | null;
-  vFCPUFDest?: number | null;
-  vICMSUFDest: number | null;
-  vICMSUFRemet: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIS {
-  CSTIS: string | null;
-  cClassTribIS?: string | null;
-  vBCIS?: number | null;
-  pIS?: number | null;
-  pISEspec?: number | null;
-  uTrib?: number | null;
-  qTrib?: number | null;
-  vIS?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBS {
-  CST: string | null;
-  cClassTrib?: string | null;
-  gIBSCBS?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBS;
-  gIBSCBSMono?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMono;
-  gTransfCred?: NFeEmissaoInfNFeDetImpostoIBSCBSGTransfCred;
-  gCredPresIBSZFM?: NFeEmissaoInfNFeDetImpostoIBSCBSGTransfCredPresIBSZFM
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBS {
-  vBC: number;
-  gIBSUF: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUF;
-  gIBSMun: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMun;
-  vIBS: number | null;
-  gCBS: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBS;
-  gTribRegular?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGTribRegular;
-  gIBSCredPres?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSCredPres;
-  gCBSCredPres?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSCredPres;
-  gTribCompraGov?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGTribCompraGov;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUF {
-  pIBSUF: number | null;
-  gDif?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGDif;
-  gDevTrib?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGDevTrib;
-  gRed?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGRed;
-  vIBSUF: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGDif {
-  pDif: number | null;
-  vDif: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGDevTrib {
-  vDevTrib: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSUFGRed {
-  pRedAliq: number | null;
-  vRedAliq: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMun {
-  pIBSMun: number | null;
-  gDif?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGDif;
-  gDevTrib?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGDevTrib;
-  gRed?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGRed;
-  vIBSMun: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGDif {
-  pDif: number | null;
-  vDif: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGDevTrib {
-  vDevTrib: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSMunGRed {
-  pRedAliq: number | null;
-  vRedAliq: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBS {
-  pCBS: number | null;
-  gDif?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGDif;
-  gDevTrib?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGDevTrib;
-  gRed?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGRed;
-  vCBS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGDif {
-  pDif: number | null;
-  vDif: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGDevTrib {
-  vDevTrib: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSGRed {
-  pRedAliq: number | null;
-  pAliqEfet: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGTribRegular {
-  CSTReg: string | null;
-  cClassTribReg: string | null;
-  pAliqEfetRegIBSUF: number | null;
-  vTribRegIBSUF: number | null;
-  pAliqEfetRegIBSMun: number | null;
-  vTribRegIBSMun: number | null;
-  pAliqEfetRegCBS: number | null;
-  vTribRegCBS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGIBSCredPres {
-  cCredPres: string | null;
-  pCredPres: number | null;
-  vCredPres?: number | null;
-  vCredPresCondSus?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGCBSCredPres {
-  cCredPres: string | null;
-  pCredPres: number | null;
-  vCredPres?: number | null;
-  vCredPresCondSus?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSGTribCompraGov {
-  pAliqIBSUF?: number | null;
-  vTribIBSUF: number | null;
-  pAliqIBSMun?: number | null;
-  vTribIBSMun: number | null;
-  pAliqCBS?: number | null;
-  vTribCBS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMono {
-  gMonoPadrao?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoPadrao;
-  gMonoReten?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoReten;
-  gMonoRet?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoRet;
-  gMonoDif?: NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoDif;
-  vTotIBSMonoItem: number | null;
-  vTotCBSMonoItem: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoPadrao {
-  qBCMono: number | null;
-  adRemIBS: number | null;
-  adRemCBS: number | null;
-  vIBSMono: number | null;
-  vCBSMono: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoReten {
-  qBCMonoReten: number | null;
-  adRemIBSReten: number | null;
-  vIBSMonoReten: number | null;
-  adRemCBSReten: number | null;
-  vCBSMonoReten: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoRet {
-  qBCMonoRet: number | null;
-  adRemIBSRet: number | null;
-  vIBSMonoRet: number | null;
-  adRemCBSRet: number | null;
-  vCBSMonoRet: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGIBSCBSMonoGMonoDif {
-  pDifIBS: number | null;
-  vIBSMonoDif: number | null;
-  pDifCBS: number | null;
-  vCBSMonoDif: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGTransfCred {
-  vIBS: number | null;
-  vCBS: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoIBSCBSGTransfCredPresIBSZFM {
-  tpCredPresIBSZFM: 0 | 1 | 2 | 3 | 4 | null;
-  vCredPresIBSZFM?: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoDevol {
-  pDevol: number | null;
-  IPI: NFeEmissaoInfNFeDetImpostoDevolIPI;
-}
-
-export interface NFeEmissaoInfNFeDetImpostoDevolIPI {
-  pIPIDevol: number | null;
-}
-
-export interface NFeEmissaoInfNFeDetObsItem {
-  obsCont?: NFeEmissaoInfNFeDetObsItemObsCont;
-  obsFisco?: NFeEmissaoInfNFeDetObsItemObsFisco;
-}
-
-export interface NFeEmissaoInfNFeDetObsItemObsCont {
-  xCampo?: string | null;
-  xTexto?: string | null;
-}
-
-export interface NFeEmissaoInfNFeDetObsItemObsFisco {
-  xCampo?: string | null;
-  xTexto?: string | null;
-}
-
-export interface NFeEmissaoInfNFeDetDFeReferenciado {
-  chaveAcesso: string | null;
-  nItem?: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotal {
-  ICMSTot: NFeEmissaoInfNFeTotalICMSTot;
-  ISSQNtot?: NFeEmissaoInfNFeTotalISSQNtot;
-  retTrib?: NFeEmissaoInfNFeTotalRetTrib;
-  ISTot?: NFeEmissaoInfNFeTotalISTot;
-  IBSCBSTot?: NFeEmissaoInfNFeTotalIBSCBSTot;
-  vNFTot?: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalICMSTot {
-  vBC: number | null;
-  vICMS: number | null;
-  vICMSDeson: number | null;
-  vFCPUFDest?: number | null;
-  vICMSUFDest?: number | null;
-  vICMSUFRemet?: number | null;
-  vFCP: number | null;
-  vBCST: number | null;
-  vST: number | null;
-  vFCPST: number | null;
-  vFCPSTRet: number | null;
-  qBCMono?: number | null;
-  vICMSMono?: number | null;
-  qBCMonoReten?: number | null;
-  vICMSMonoReten?: number | null;
-  qBCMonoRet?: number | null;
-  vICMSMonoRet?: number | null;
-  vProd: number | null;
-  vFrete: number | null;
-  vSeg: number | null;
-  vDesc: number | null;
-  vII: number | null;
-  vIPI: number | null;
-  vIPIDevol: number | null;
-  vPIS: number | null;
-  vCOFINS: number | null;
-  vOutro: number | null;
-  vNF: number | null;
-  vTotTrib?: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalISSQNtot {
-  vServ?: number | null;
-  vBC?: number | null;
-  vISS?: number | null;
-  vPIS?: number | null;
-  vCOFINS?: number | null;
-  dCompet: string | null;
-  vDeducao?: number | null;
-  vOutro?: number | null;
-  vDescIncond?: number | null;
-  vDescCond?: number | null;
-  vISSRet?: number | null;
-  cRegTrib?: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalRetTrib {
-  vRetPIS?: number | null;
-  vRetCOFINS?: number | null;
-  vRetCSLL?: number | null;
-  vBCIRRF?: number | null;
-  vIRRF?: number | null;
-  vBCRetPrev?: number | null;
-  vRetPrev?: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalISTot {
-  vIS: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTot {
-  vBCIBSCBS: number | null;
-  gIBS?: NFeEmissaoInfNFeTotalIBSCBSTotGIBS;
-  gCBS?: NFeEmissaoInfNFeTotalIBSCBSTotGCBS;
-  gMono?: NFeEmissaoInfNFeTotalIBSCBSTotGMono;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTotGIBS {
-  gIBSUF: NFeEmissaoInfNFeTotalIBSCBSTotGIBSGIBSUF;
-  gIBSMun: NFeEmissaoInfNFeTotalIBSCBSTotGIBSGIBSMun;
-  vIBS: number | null;
-  vCredPres: number | null;
-  vCredPresCondSus: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTotGIBSGIBSUF {
-  vDif: number | null;
-  vDevTrib: number | null;
-  vIBSUF: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTotGIBSGIBSMun {
-  vDif: number | null;
-  vDevTrib: number | null;
-  vIBSMun: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTotGCBS {
-  vDif: number | null;
-  vDevTrib: number | null;
-  vCBS: number | null;
-  vCredPres: number | null;
-  vCredPresCondSus: number | null;
-}
-
-export interface NFeEmissaoInfNFeTotalIBSCBSTotGMono {
-  vIBSMono: number | null;
-  vCBSMono: number | null;
-  vIBSMonoReten: number | null;
-  vCBSMonoReten: number | null;
-  vIBSMonoRet: number | null;
-  vCBSMonoRet: number | null;
-}
-
-export interface NFeEmissaoInfNFeTransp {
-  modFrete: 0 | 1 | 2 | 3 | 4 | 9 | null;
-  transporta?: NFeEmissaoInfNFeTranspTransporta;
-  retTransp?: NFeEmissaoInfNFeTranspRetTransp;
-  veicTransp?: NFeEmissaoInfNFeTranspVeicTransp;
-  reboque?: NFeEmissaoInfNFeTranspVeicTransp[];
-  vagao?: string | null;
-  balsa?: string | null;
-  vol?: NFeEmissaoInfNFeTranspVol[];
-}
-
-export interface NFeEmissaoInfNFeTranspTransporta {
-  CNPJ?: string | null;
-  CPF?: string | null;
-  xNome?: string | null;
-  IE?: string | null;
-  xEnder?: string | null;
-  xMun?: string | null;
-  UF?: string | null;
-}
-
-export interface NFeEmissaoInfNFeTranspRetTransp {
-  vServ: number | null;
-  vBCRet: number | null;
-  pICMSRet: number | null;
-  vICMSRet: number | null;
-  CFOP: string | null;
-  cMunFG: string | null;
-}
-
-export interface NFeEmissaoInfNFeTranspVeicTransp {
-  placa: string | null;
-  UF?: string | null;
-  RNTC?: string | null;
-}
-
-export interface NFeEmissaoInfNFeTranspVol {
-  qVol?: number | null;
-  esp?: string | null;
-  marca?: string | null;
-  nVol?: string | null;
-  pesoL?: number | null;
-  pesoB?: number | null;
-  lacres?: NFeEmissaoInfNFeTranspVolLacre[];
-}
-
-export interface NFeEmissaoInfNFeTranspVolLacre {
-  nLacre: string | null;
-}
-
-export interface NFeEmissaoInfNFeCobr {
-  fat?: NFeEmissaoInfNFeCobrFat;
-  dup?: NFeEmissaoInfNFeCobrDup[];
-}
-
-export interface NFeEmissaoInfNFeCobrFat {
-  nFat?: string | null;
-  vOrig?: number | null;
-  vDesc?: number | null;
-  vLiq?: number | null;
-}
-
-export interface NFeEmissaoInfNFeCobrDup {
-  nDup?: string | null;
-  dVenc?: string | null;
-  vDup: number | null;
-}
-
-export interface NFeEmissaoInfNFePag {
-  detPag: NFeEmissaoInfNFePagDetPag[];
-  vTroco?: number | null;
-}
-
-export interface NFeEmissaoInfNFePagDetPag {
-  indPag?: 1 | null;
-  tPag: string | null;
-  xPag?: string | null;
-  dPag?: string | null;
-  CNPJPag?: string | null;
-  UFPag?: string | null;
-  card?: NFeEmissaoInfNFePagDetPagCard;
-}
-
-export interface NFeEmissaoInfNFePagDetPagCard {
-  tpIntegra: 1 | 2 | null;
-  CNPJ?: string | null;
-  tBand?: string | null;
-  cAut?: string | null;
-  CNPJReceb?: string | null;
-  idTermPag?: string | null;
-}
-
-export interface NFeEmissaoInfNFeInfIntermed {
-  CNPJ: string | null;
-  idCadIntTran: string | null;
-}
-
-export interface NFeEmissaoInfNFeInfAdic {
-  infAdFisco?: string | null;
-  infCpl?: string | null;
-  obsCont?: NFeEmissaoInfNFeInfAdicObsCont[];
-  obsFisco?: NFeEmissaoInfNFeInfAdicObsFisco[];
-  obsRet?: NFeEmissaoInfNFeInfAdicObsRet[];
-}
-
-export interface NFeEmissaoInfNFeInfAdicObsCont {
-  xCampo?: string | null;
-  xTexto?: string | null;
-}
-
-export interface NFeEmissaoInfNFeInfAdicObsFisco {
-  xCampo?: string | null;
-  xTexto?: string | null;
-}
-
-export interface NFeEmissaoInfNFeInfAdicObsRet {
-  nProc: string | null;
-  indProc: 0 | 1 | 2 | 3 | 4 | 9 | null;
-  tpAto?: '08' | '10' | '12' | '14' | '15';
-}
-
-export interface NFeEmissaoInfNFeExporta {
-  UFSaidaPais: string | null;
-  xLocExporta: string | null;
-  xLocDespacho?: string | null;
-}
-
-export interface NFeEmissaoInfNFeCompra {
-  xNEmp?: string | null;
-  xPed?: string | null;
-  xCont?: string | null;
-}
-
-export interface NFeEmissaoInfNFeCana {
-  safra: string | null;
-  ref: string | null;
-  forDia: NFeEmissaoInfNFeCanaForDia[];
-  qTotMes: number | null;
-  qTotAnt: number | null;
-  qTotGer: number | null;
-  deduc?: NFeEmissaoInfNFeCanaDeduc;
-  vFor: number | null;
-  vTotDed: number | null;
-  vLiqFor: number | null;
-}
-
-export interface NFeEmissaoInfNFeCanaForDia {
-  dia: number | null;
-  qtde: number | null;
-}
-
-export interface NFeEmissaoInfNFeCanaDeduc {
-  xDed: string | null;
-  vDed: number | null;
-}
-
-export interface NFeEmissaoInfNFeInfRespTec {
-  CNPJ: string | null;
-  xContato: string | null;
-  email: string | null;
-  fone: string | null;
-  idCSRT?: number | null;
-  CSRT?: string | null;
-  hashCSRT?: string | null;
-}
-
-export interface NFeEmissaoInfNFeInfSolicNFF {
-  xSolic: string | null;
-}
-
-export interface NFeEmissaoInfNFeAgropecuario {
-  defensivo?: NFeEmissaoInfNFeAgropecuarioDefensivo[];
-  guiaTransito?: NFeEmissaoInfNFeAgropecuarioGuiaTransito;
-}
-
-export interface NFeEmissaoInfNFeAgropecuarioDefensivo {
-  nReceituario: string | null;
-  CPFRespTec: string | null;
-}
-
-export interface NFeEmissaoInfNFeAgropecuarioGuiaTransito {
-  tpGuia: 1 | 2 | 3 | 4 | 5 | 6 | 7 | null;
-  UFGuia?: string | null;
-  serieGuia?: string | null;
-  nGuia: string | null;
+export interface NfeSefazPISNT {
+  CST: string;
+}
+
+export interface NfeSefazPISOutr {
+  CST: string;
+  vBC?: number;
+  pPIS?: number;
+  qBCProd?: number;
+  vAliqProd?: number;
+  vPIS: number;
+}
+
+export interface NfeSefazPISQtde {
+  CST: string;
+  qBCProd: number;
+  vAliqProd: number;
+  vPIS: number;
+}
+
+export interface NfeSefazPISST {
+  vBC?: number;
+  pPIS?: number;
+  qBCProd?: number;
+  vAliqProd?: number;
+  vPIS: number;
+  indSomaPISST?: number;
+}
+
+export interface NfeSefazPag {
+  detPag: NfeSefazDetPag[];
+  vTroco?: number;
+}
+
+export interface NfeSefazProcRef {
+  nProc: string;
+  indProc: number;
+  tpAto?: string;
+}
+
+export interface NfeSefazProd {
+  cProd: string;
+  cEAN: string;
+  cBarra?: string;
+  xProd: string;
+  NCM: string;
+  NVE?: string[];
+  CEST?: string;
+  indEscala?: string;
+  CNPJFab?: string;
+  cBenef?: string;
+  gCred?: NfeSefazGCred[];
+  EXTIPI?: string;
+  CFOP: string;
+  uCom: string;
+  qCom: number;
+  vUnCom: number;
+  vProd: number;
+  cEANTrib: string;
+  cBarraTrib?: string;
+  uTrib: string;
+  qTrib: number;
+  vUnTrib: number;
+  vFrete?: number;
+  vSeg?: number;
+  vDesc?: number;
+  vOutro?: number;
+  indTot: number;
+  indBemMovelUsado?: number;
+  DI?: NfeSefazDI[];
+  detExport?: NfeSefazDetExport[];
+  xPed?: string;
+  nItemPed?: number;
+  nFCI?: string;
+  rastro?: NfeSefazRastro[];
+  infProdNFF?: NfeSefazInfProdNFF;
+  infProdEmb?: NfeSefazInfProdEmb;
+  veicProd?: NfeSefazVeicProd;
+  med?: NfeSefazMed;
+  arma?: NfeSefazArma[];
+  comb?: NfeSefazComb;
+  nRECOPI?: string;
+}
+
+export interface NfeSefazRastro {
+  nLote: string;
+  qLote: number;
+  dFab: string;
+  dVal: string;
+  cAgreg?: string;
+}
+
+export interface NfeSefazRed {
+  pRedAliq: number;
+  pAliqEfet: number;
+}
+
+export interface NfeSefazRefECF {
+  mod: string;
+  nECF: number;
+  nCOO: number;
+}
+
+export interface NfeSefazRefNF {
+  cUF: number;
+  AAMM: string;
+  CNPJ: string;
+  mod: string;
+  serie: number;
+  nNF: number;
+}
+
+export interface NfeSefazRefNFP {
+  cUF: number;
+  AAMM: string;
+  CNPJ?: string;
+  CPF?: string;
+  IE: string;
+  mod: string;
+  serie: number;
+  nNF: number;
+}
+
+export interface NfeSefazRetTransp {
+  vServ: number;
+  vBCRet: number;
+  pICMSRet: number;
+  vICMSRet: number;
+  CFOP: string;
+  cMunFG: string;
+}
+
+export interface NfeSefazRetTrib {
+  vRetPIS?: number;
+  vRetCOFINS?: number;
+  vRetCSLL?: number;
+  vBCIRRF?: number;
+  vIRRF?: number;
+  vBCRetPrev?: number;
+  vRetPrev?: number;
+}
+
+export interface NfeSefazTotal {
+  ICMSTot: NfeSefazICMSTot;
+  ISSQNtot?: NfeSefazISSQNtot;
+  retTrib?: NfeSefazRetTrib;
+  ISTot?: NfeSefazISTot;
+  IBSCBSTot?: NfeSefazIBSCBSMonoTot;
+  vNFTot?: number;
+}
+
+export interface NfeSefazTransfCred {
+  vIBS: number;
+  vCBS: number;
+}
+
+export interface NfeSefazTransp {
+  modFrete: number;
+  transporta?: NfeSefazTransporta;
+  retTransp?: NfeSefazRetTransp;
+  veicTransp?: NfeSefazVeiculo;
+  reboque?: NfeSefazVeiculo[];
+  vagao?: string;
+  balsa?: string;
+  vol?: NfeSefazVol[];
+}
+
+export interface NfeSefazTransporta {
+  CNPJ?: string;
+  CPF?: string;
+  xNome?: string;
+  IE?: string;
+  xEnder?: string;
+  xMun?: string;
+  UF?: string;
+}
+
+export interface NfeSefazTribCompraGov {
+  pAliqIBSUF?: number;
+  vTribIBSUF: number;
+  pAliqIBSMun?: number;
+  vTribIBSMun: number;
+  pAliqCBS?: number;
+  vTribCBS: number;
+}
+
+export interface NfeSefazTribNFe {
+  CST: string;
+  cClassTrib?: string;
+  gIBSCBS?: NfeSefazCIBS;
+  gIBSCBSMono?: NfeSefazMonofasia;
+  gTransfCred?: NfeSefazTransfCred;
+  gCredPresIBSZFM?: NfeSefazCredPresIBSZFM;
+}
+
+export interface NfeSefazTribRegular {
+  CSTReg: string;
+  cClassTribReg: string;
+  pAliqEfetRegIBSUF: number;
+  vTribRegIBSUF: number;
+  pAliqEfetRegIBSMun: number;
+  vTribRegIBSMun: number;
+  pAliqEfetRegCBS: number;
+  vTribRegCBS: number;
+}
+
+export interface NfeSefazVeicProd {
+  tpOp: number;
+  chassi: string;
+  cCor: string;
+  xCor: string;
+  pot: string;
+  cilin: string;
+  pesoL: string;
+  pesoB: string;
+  nSerie: string;
+  tpComb: string;
+  nMotor: string;
+  CMT: string;
+  dist: string;
+  anoMod: number;
+  anoFab: number;
+  tpPint: string;
+  tpVeic: number;
+  espVeic: number;
+  VIN: string;
+  condVeic: number;
+  cMod: string;
+  cCorDENATRAN: string;
+  lota: number;
+  tpRest: number;
+}
+
+export interface NfeSefazVeiculo {
+  placa: string;
+  UF?: string;
+  RNTC?: string;
+}
+
+export interface NfeSefazVol {
+  qVol?: number;
+  esp?: string;
+  marca?: string;
+  nVol?: string;
+  pesoL?: number;
+  pesoB?: number;
+  lacres?: NfeSefazLacres[];
 }
