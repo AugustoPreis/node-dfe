@@ -9,6 +9,7 @@ import { DCeService } from './services/dce';
 import { HttpClient } from './core/httpClient';
 import { CTeOsService } from './services/cte-os';
 import { NFComService } from './services/nfcom';
+import { DistribuicaoNFeService } from './services/distribuicao-nfe';
 import { Authenticator } from './core/authenticator';
 import { SdkConfig } from './types/common';
 
@@ -24,6 +25,7 @@ class NuvemFiscalApi {
   public cteOs: CTeOsService;
   public dce: DCeService;
   public nfCom: NFComService;
+  public distribuicaoNfe: DistribuicaoNFeService;
 
   private httpClient: HttpClient;
 
@@ -45,6 +47,7 @@ class NuvemFiscalApi {
     this.cteOs = new CTeOsService(this.httpClient);
     this.dce = new DCeService(this.httpClient);
     this.nfCom = new NFComService(this.httpClient);
+    this.distribuicaoNfe = new DistribuicaoNFeService(this.httpClient);
   }
 }
 
