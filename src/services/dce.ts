@@ -1,6 +1,6 @@
 import { HttpClient } from '../core/httpClient';
 import { DcePedidoCancelamento, DcePedidoEmissao } from '../types/dce';
-import { Dfe, DfeCancelamento, DfeListagem, DfeListagemQuery } from '../types/dfe';
+import { Dfe, DfeCancelamento, DfeConsultaStatusServicoQuery, DfeListagem, DfeListagemQuery, DfeSefazStatus } from '../types/dfe';
 
 const BASE = '/dce';
 
@@ -19,6 +19,14 @@ export class DCeService {
     return await this.httpClient.get<Dfe>(`${BASE}/${id}`);
   }
 
+  async consultarStatusServico(params: DfeConsultaStatusServicoQuery): Promise<DfeSefazStatus> {
+    return await this.httpClient.get<DfeSefazStatus>(`${BASE}/sefaz/status`, { params });
+  }
+
+  async consultarCancelamento(id: string): Promise<DfeCancelamento> {
+    return await this.httpClient.get<DfeCancelamento>(`${BASE}/cancelamento/${id}`);
+  }
+
   async emitir(dados: DcePedidoEmissao): Promise<Dfe> {
     return await this.httpClient.post<Dfe>(BASE, dados);
   }
@@ -35,6 +43,18 @@ export class DCeService {
 
   async baixarXML(id: string, processada = true): Promise<Buffer> {
     return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml${processada ? '' : '/declaracao'}`, {
+      responseType: 'arraybuffer',
+    });
+  }
+
+  async baixarXMLCancelamento(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/cancelamento/${id}/xml`, {
+      responseType: 'arraybuffer',
+    });
+  }
+
+  async baixarXMLProtocolo(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml/protocolo`, {
       responseType: 'arraybuffer',
     });
   }
