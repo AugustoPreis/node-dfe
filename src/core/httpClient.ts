@@ -67,4 +67,9 @@ export class HttpClient {
   async put<T>(url: string, data?: any, config?: AxiosRequestConfig<any> | undefined): Promise<T> {
     return this.client.put<T>(url, data, config) as T;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async delete<T>(url: string, config?: AxiosRequestConfig<any> | undefined): Promise<T> {
+    return this.client.delete<T>(url, config) as T;
+  }
 }
