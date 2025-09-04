@@ -1,3 +1,5 @@
+import { Ambiente } from './common';
+
 export interface DcePedidoCancelamento {
   justificativa?: string;
 }
@@ -5,7 +7,7 @@ export interface DcePedidoCancelamento {
 export interface DcePedidoEmissao {
   infDCe: DceSefazInfDCe;
   infSolicDCe: DceSefazInfSolicDCe;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
   referencia?: string;
 }
 

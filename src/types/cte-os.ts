@@ -1,3 +1,5 @@
+import { Ambiente } from './common';
+
 export interface CteOsPedidoCancelamento {
   justificativa?: string;
 }
@@ -5,7 +7,7 @@ export interface CteOsPedidoCancelamento {
 export interface CteOsPedidoEmissao {
   infCte: CteOsSefazInfCteOS;
   infCTeSupl?: CteOsSefazInfCTeSuplOS;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
   referencia?: string;
 }
 

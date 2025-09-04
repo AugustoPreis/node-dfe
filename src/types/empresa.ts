@@ -1,3 +1,5 @@
+import { Ambiente } from './common';
+
 export interface EmpresaListagemQuery {
   $top?: string;
   $skip?: string;
@@ -31,33 +33,33 @@ export interface EmpresaCertificado {
 
 export interface EmpresaConfigCte {
   CRT?: number;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigCteOs {
   CRT?: number;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigDce {
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigDistribuicaoNfe {
   distribuicao_automatica?: boolean;
   distribuicao_intervalo_horas?: number;
   ciencia_automatica?: boolean;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigMdfe {
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigNfce {
   CRT?: number;
   sefaz: EmpresaConfigNfceSefaz;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigNfceSefaz {
@@ -67,12 +69,12 @@ export interface EmpresaConfigNfceSefaz {
 
 export interface EmpresaConfigNfcom {
   CRT?: number;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigNfe {
   CRT?: number;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigNfse {
@@ -80,7 +82,7 @@ export interface EmpresaConfigNfse {
   rps: EmpresaConfigRps;
   prefeitura?: EmpresaConfigPrefeitura;
   incentivo_fiscal?: boolean;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
 }
 
 export interface EmpresaConfigNfseRegTrib {

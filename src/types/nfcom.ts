@@ -1,10 +1,12 @@
+import { Ambiente } from './common';
+
 export interface NfcomPedidoCancelamento {
   justificativa?: string;
 }
 
 export interface NfcomPedidoEmissao {
   infNFCom: NfcomSefazInfNFCom;
-  ambiente: 'homologacao' | 'producao';
+  ambiente: Ambiente;
   referencia?: string;
 }
 
