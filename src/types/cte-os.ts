@@ -1,7 +1,37 @@
 import { Ambiente } from './common';
+import { DfeAutorEvento, StatusEventoDfe } from './dfe';
 
 export interface CteOsPedidoCancelamento {
   justificativa?: string;
+}
+
+export interface CteOsCartaCorrecao {
+  correcoes: CteOsInfCorrecao[];
+  id?: string;
+  ambiente?: Ambiente;
+  status?: StatusEventoDfe;
+  autor?: DfeAutorEvento;
+  chave_acesso?: string;
+  data_evento?: string;
+  numero_sequencial?: number;
+  data_recebimento?: string;
+  codigo_status?: number;
+  motivo_status?: string;
+  numero_protocolo?: string;
+  codigo_mensagem?: number;
+  mensagem?: string;
+  tipo_evento?: string;
+}
+
+export interface CteOsPedidoCartaCorrecao {
+  correcoes: CteOsInfCorrecao[];
+}
+
+export interface CteOsInfCorrecao {
+  grupo_alterado: string;
+  campo_alterado: string;
+  valor_alterado: string;
+  numero_item_alterado?: number;
 }
 
 export interface CteOsPedidoEmissao {

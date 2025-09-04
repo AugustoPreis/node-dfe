@@ -2,7 +2,9 @@ import { Ambiente } from './common';
 
 export type StatusDfe = 'pendente' | 'autorizado' | 'rejeitado' | 'denegado' | 'encerrado' | 'cancelado' | 'erro';
 export type StatusEventoDfe = 'pendente' | 'registrado' | 'rejeitado' | 'erro';
+export type StatusSincronizacaoDfe = 'pendente' | 'sincronizado' | 'erro';
 export type StatusDfeLote = 'pendente' | 'processado' | 'erro';
+export type EstadosAutorizadorDfe = 'AM' | 'BA' | 'CE' | 'GO' | 'MG' | 'MS' | 'MT' | 'PE' | 'PR' | 'RS' | 'SP' | 'SVAN' | 'SVRS' | 'SVCAN' | 'SVCRS' | 'AN' | 'SVSP' | 'SVCSP';
 
 export interface DfeListagemQuery {
   $top?: string;
@@ -24,6 +26,11 @@ export interface DfeListagemLotesQuery {
   ambiente: Ambiente;
 }
 
+export interface DfeConsultaStatusServicoQuery {
+  cpf_cnpj: string;
+  autorizador?: string;
+}
+
 export interface DfeListagem {
   '@count'?: number;
   data?: Dfe[];
@@ -43,6 +50,41 @@ export interface Dfe {
   valor_total?: number;
   chave?: string;
   autorizacao?: DfeAutorizacao;
+}
+
+export interface DfeEvento {
+  id?: string;
+  ambiente?: Ambiente;
+  status?: StatusEventoDfe;
+  autor?: DfeAutorEvento;
+  chave_acesso?: string;
+  data_evento?: string;
+  numero_sequencial?: number;
+  data_recebimento?: string;
+  codigo_status?: number;
+  motivo_status?: string;
+  numero_protocolo?: string;
+  codigo_mensagem?: number;
+  mensagem?: string;
+  tipo_evento?: string;
+}
+
+export interface DfeSefazStatus {
+  autorizador?: EstadosAutorizadorDfe;
+  ambiente?: Ambiente;
+  data_hora_consulta?: string;
+  codigo_status?: number;
+  motivo_status?: string;
+  tempo_medio_resposta?: number;
+  data_hora_retorno?: string;
+}
+
+export interface DfeSincronizacao {
+  status?: StatusSincronizacaoDfe;
+  codigo_status?: number;
+  motivo_status?: string;
+  data_recebimento?: string;
+  chave?: string;
 }
 
 export interface DfeAutorizacao {
