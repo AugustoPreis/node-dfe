@@ -39,6 +39,16 @@ export interface DfeListagemEventosQuery {
   dfe_id: string;
 }
 
+export interface DfePreviaQuery {
+  logotipo?: boolean;
+  nome_fantasia?: boolean;
+  mensagem_rodape?: string;
+  resumido?: boolean;
+  qrcode_lateral?: boolean;
+  largura?: number;
+  margem?: string;
+}
+
 export interface DfeListagem {
   '@count'?: number;
   data?: Dfe[];
@@ -80,6 +90,24 @@ export interface DfeEvento {
 export interface DfeEventoListagem {
   '@count'?: number;
   data?: DfeEvento[];
+}
+
+export interface DfeCartaCorrecao {
+  correcao?: string;
+  id?: string;
+  ambiente?: Ambiente;
+  status?: StatusEventoDfe;
+  autor?: DfeAutorEvento;
+  chave_acesso?: string;
+  data_evento?: string;
+  numero_sequencial?: number;
+  data_recebimento?: string;
+  codigo_status?: number;
+  motivo_status?: string;
+  numero_protocolo?: string;
+  codigo_mensagem?: number;
+  mensagem?: string;
+  tipo_evento?: string;
 }
 
 export interface DfeSefazStatus {
@@ -201,4 +229,50 @@ export interface DfeInutilizacao {
   codigo_mensagem?: number;
   mensagem?: string;
   tipo_evento?: string;
+}
+
+export interface DfeContribuinteInfCons {
+  codigo_status: number;
+  motivo_status: string;
+  uf: string;
+  ie?: string;
+  cnpj?: string;
+  cpf?: string;
+  data_consulta: string;
+  uf_atendimento: number;
+  informacoes_cadastrais?: DfeContribuinteInfCad[];
+}
+
+export interface DfeContribuinteInfCad {
+  ie: string;
+  cnpj?: string;
+  cpf?: string;
+  uf: string;
+  situacao_cadastral: number;
+  indicador_nfe: number;
+  indicador_cte: number;
+  nome_razao_social: string;
+  nome_fantasia?: string;
+  regime_apuracao_icms?: string;
+  cnae?: string;
+  data_inicio_atividade?: string;
+  data_situacao_cadastral?: string;
+  data_fim_atividade?: string;
+  ie_unica?: string;
+  ie_atual?: string;
+  endereco?: DfeContribuinteEndereco;
+}
+
+export interface DfeContribuinteEndereco {
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  codigo_municipio: string;
+  nome_municipio: string;
+  uf: string;
+  cep?: string;
+  codigo_pais?: string;
+  pais?: string;
+  fone?: string;
 }

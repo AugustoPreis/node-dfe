@@ -1,7 +1,18 @@
 import { Ambiente } from './common';
 
+export interface NfeConsultaContribuinteQuery {
+  cpf_cnpj: string;
+  uf?: string;
+  argumento: string;
+  documento: string;
+}
+
 export interface NfePedidoCancelamento {
   justificativa?: string;
+}
+
+export interface NfePedidoCartaCorrecao {
+  correcao?: string;
 }
 
 export interface NfePedidoEmissao {

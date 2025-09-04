@@ -1,8 +1,8 @@
 import { HttpClient } from '../core/httpClient';
-import { Dfe, DfeCancelamento, DfeConsultaStatusServicoQuery, DfeEvento, DfeEventoListagem, DfeInutilizacao, DfeListagem, DfeListagemEventosQuery, DfeLote, DfeLoteListagem, DfePedidoEnvioEmail, DfePedidoInutilizacao, DfeSefazStatus, DfeSincronizacao } from '../types/dfe';
+import { Dfe, DfeCancelamento, DfeConsultaStatusServicoQuery, DfeEvento, DfeEventoListagem, DfeInutilizacao, DfeListagem, DfeListagemEventosQuery, DfeLote, DfeLoteListagem, DfePedidoEnvioEmail, DfePedidoInutilizacao, DfePreviaQuery, DfeSefazStatus, DfeSincronizacao } from '../types/dfe';
 import { DfeListagemLotesQuery, DfeListagemQuery } from '../types/dfe';
 import { EmailStatusResponse } from '../types/email';
-import { NfceComandosEscPosImpressaoQuery, NfcePreviaQuery } from '../types/nfce';
+import { NfceComandosEscPosImpressaoQuery } from '../types/nfce';
 import { NfePedidoCancelamento, NfePedidoEmissao, NfePedidoEmissaoLote } from '../types/nfe';
 
 const BASE = '/nfce';
@@ -95,14 +95,14 @@ export class NFCeService {
     });
   }
 
-  async baixarPreviaPDF(params: NfcePreviaQuery, dados: NfePedidoEmissao): Promise<Buffer> {
+  async baixarPreviaPDF(params: DfePreviaQuery, dados: NfePedidoEmissao): Promise<Buffer> {
     return await this.httpClient.post<Buffer>(`${BASE}/previa/pdf`, dados, {
       params,
       responseType: 'arraybuffer',
     });
   }
 
-  async baixarPreviaXML(params: NfcePreviaQuery, dados: NfePedidoEmissao): Promise<Buffer> {
+  async baixarPreviaXML(params: DfePreviaQuery, dados: NfePedidoEmissao): Promise<Buffer> {
     return await this.httpClient.post<Buffer>(`${BASE}/previa/xml`, dados, {
       params,
       responseType: 'arraybuffer',
