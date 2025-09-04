@@ -1,4 +1,5 @@
 import { Ambiente } from './common';
+import { EnderecoEmail } from './email';
 
 export type StatusDfe = 'pendente' | 'autorizado' | 'rejeitado' | 'denegado' | 'encerrado' | 'cancelado' | 'erro';
 export type StatusEventoDfe = 'pendente' | 'registrado' | 'rejeitado' | 'erro';
@@ -29,6 +30,13 @@ export interface DfeListagemLotesQuery {
 export interface DfeConsultaStatusServicoQuery {
   cpf_cnpj: string;
   autorizador?: string;
+}
+
+export interface DfeListagemEventosQuery {
+  $top?: string;
+  $skip?: string;
+  $inlinecount?: boolean;
+  dfe_id: string;
 }
 
 export interface DfeListagem {
@@ -67,6 +75,11 @@ export interface DfeEvento {
   codigo_mensagem?: number;
   mensagem?: string;
   tipo_evento?: string;
+}
+
+export interface DfeEventoListagem {
+  '@count'?: number;
+  data?: DfeEvento[];
 }
 
 export interface DfeSefazStatus {
@@ -160,6 +173,10 @@ export interface DfePedidoInutilizacao {
   numero_inicial: number;
   numero_final: number;
   justificativa: string;
+}
+
+export interface DfePedidoEnvioEmail {
+  destinatarios?: EnderecoEmail[];
 }
 
 export interface DfeInutilizacao {
