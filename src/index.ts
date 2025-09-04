@@ -1,3 +1,4 @@
+import { EmpresaService } from './services/empresa';
 import { NFeService } from './services/nfe';
 import { NFSeService } from './services/nfse';
 import { NFCeService } from './services/nfce';
@@ -12,6 +13,7 @@ import { SdkConfig } from './types/common';
 
 class NuvemFiscalApi {
   public authenticator: Authenticator;
+  public empresa: EmpresaService;
   public nfe: NFeService;
   public nfse: NFSeService;
   public nfce: NFCeService;
@@ -31,6 +33,7 @@ class NuvemFiscalApi {
     this.httpClient = new HttpClient(this.authenticator, config);
 
     // 3. Inicializa os serviços
+    this.empresa = new EmpresaService(this.httpClient);
     this.nfe = new NFeService(this.httpClient);
     this.nfse = new NFSeService(this.httpClient);
     this.nfce = new NFCeService(this.httpClient);
