@@ -1,4 +1,4 @@
-import { Ambiente, Provedor } from './common';
+import { Ambiente, CredenciaisRequeridasProvedor, Provedor } from './common';
 import { Endereco, EnderecoSimples } from './endereco';
 
 export type StatusNfse = 'processando' | 'autorizada' | 'negada' | 'cancelada' | 'substituida' | 'erro';
@@ -39,6 +39,20 @@ export interface NfseDpsPedidoEmissao {
 export interface NfseListagem {
   '@count'?: number;
   data?: Nfse[];
+}
+
+export interface NfseCidadesAtendidas {
+  '@count'?: number;
+  data?: string[];
+}
+
+export interface NfseCidadeMetadados {
+  codigo_ibge?: string;
+  uf?: string;
+  municipio?: string;
+  provedor?: string;
+  ambientes?: Ambiente[];
+  credenciais?: CredenciaisRequeridasProvedor[];
 }
 
 export interface NfseLoteDpsPedidoEmissao {

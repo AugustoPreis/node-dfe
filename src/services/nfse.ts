@@ -1,8 +1,10 @@
 import { HttpClient } from '../core/httpClient';
-import { DfeListagemLotesQuery, DfeListagemQuery } from '../types/dfe';
+import { DfeListagemLotesQuery, DfeListagemQuery, DfeSincronizacao } from '../types/dfe';
 import {
   Nfse,
   NfseCancelamento,
+  NfseCidadeMetadados,
+  NfseCidadesAtendidas,
   NfseDpsPedidoEmissao,
   NfseListagem,
   NfseLoteDpsPedidoEmissao,
@@ -60,12 +62,24 @@ export class NFSeService {
     return await this.httpClient.get<NfseCancelamento>(`${BASE}/${id}/cancelamento`);
   }
 
+  async consultarMetadados(codigoIbge: string): Promise<NfseCidadeMetadados> {
+    return await this.httpClient.get<NfseCidadeMetadados>(`${BASE}/cidades/${codigoIbge}`);
+  }
+
+  async cidadesAtendidas(): Promise<NfseCidadesAtendidas> {
+    return await this.httpClient.get<NfseCidadesAtendidas>(`${BASE}/cidades`);
+  }
+
   async emitir(dados: NfseDpsPedidoEmissao): Promise<Nfse> {
     return await this.httpClient.post<Nfse>(`${BASE}/dps`, dados);
   }
 
   async emitirLote(dados: NfseLoteDpsPedidoEmissao): Promise<RpsLote> {
     return await this.httpClient.post<RpsLote>(`${BASE}/dps/lotes`, dados);
+  }
+
+  async sincronizar(id: string): Promise<DfeSincronizacao> {
+    return await this.httpClient.post<DfeSincronizacao>(`${BASE}/${id}/sincronizar`);
   }
 
   async cancelar(id: string, dados: NfsePedidoCancelamento): Promise<NfseCancelamento> {
@@ -86,4 +100,17 @@ export class NFSeService {
       responseType: 'arraybuffer',
     });
   }
+
+  async baixarXMLDPS(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/xml/dps`, {
+      responseType: 'arraybuffer',
+    });
+  }
+
+  async baixarXMLCancelamento(id: string): Promise<Buffer> {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/cancelamento/xml`, {
+      responseType: 'arraybuffer',
+    });
+  }
+
 }

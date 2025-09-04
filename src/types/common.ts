@@ -1,5 +1,6 @@
 export type Ambiente = 'producao' | 'homologacao';
 export type Provedor = 'padrao' | 'nacional';
+export type CredenciaisRequeridasProvedor = 'certificado' | 'login_senha' | 'token';
 
 export interface SdkConfig {
   environment: Ambiente;
