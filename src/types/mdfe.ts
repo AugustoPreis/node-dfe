@@ -1,6 +1,48 @@
 import { Ambiente } from './common';
 import { DfeAutorEvento, StatusEventoDfe } from './dfe';
 
+export interface MdfeConsultaNaoEncerradosQuery {
+  cpfCnpj: string;
+}
+
+export interface MdfeNaoEncerrado {
+  chMDFe: string;
+  nProt: string;
+}
+
+export interface MdfeNaoEncerrados {
+  tpAmb?: number;
+  verAplic?: string;
+  cStat: number;
+  xMotivo?: string;
+  cUF?: number;
+  infMDFe?: MdfeNaoEncerrado[];
+}
+
+export interface MdfePedidoInclusaoCondutor {
+  nome_condutor: string;
+  cpf_condutor: string;
+}
+
+export interface MdfeInclusaoCondutor {
+  nome_condutor?: string;
+  cpf_condutor?: string;
+  id?: string;
+  ambiente?: 'homologacao' | 'producao';
+  status?: 'pendente' | 'registrado' | 'rejeitado' | 'erro';
+  autor?: DfeAutorEvento;
+  chave_acesso?: string;
+  data_evento?: string;
+  numero_sequencial?: number;
+  data_recebimento?: string;
+  codigo_status?: number;
+  motivo_status?: string;
+  numero_protocolo?: string;
+  codigo_mensagem?: number;
+  mensagem?: string;
+  tipo_evento?: string;
+}
+
 export interface MdfeDocumentoVinculado {
   codigo_municipio_descarga?: string;
   municipio_descarga?: string;
@@ -96,6 +138,13 @@ export interface MdfePedidoEmissaoLote {
   ambiente: Ambiente;
   referencia?: string;
   id_lote: string;
+}
+
+export interface MdfePedidoInclusaoDfe {
+  codigo_municipio_carrega?: string;
+  municipio_carrega?: string;
+  documentos?: MdfeDocumentoVinculado[];
+  protocolo_autorizacao?: string;
 }
 
 export interface MdfePedidoEncerramento {
