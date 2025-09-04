@@ -24,7 +24,7 @@ export class DCeService {
   }
 
   async consultarCancelamento(id: string): Promise<DfeCancelamento> {
-    return await this.httpClient.get<DfeCancelamento>(`${BASE}/cancelamento/${id}`);
+    return await this.httpClient.get<DfeCancelamento>(`${BASE}/${id}/cancelamento`);
   }
 
   async emitir(dados: DcePedidoEmissao): Promise<Dfe> {
@@ -48,7 +48,7 @@ export class DCeService {
   }
 
   async baixarXMLCancelamento(id: string): Promise<Buffer> {
-    return await this.httpClient.get<Buffer>(`${BASE}/cancelamento/${id}/xml`, {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/cancelamento/xml`, {
       responseType: 'arraybuffer',
     });
   }

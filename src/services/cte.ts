@@ -28,7 +28,7 @@ export class CTeService {
   }
 
   async consultarCancelamento(id: string): Promise<DfeCancelamento> {
-    return await this.httpClient.get<DfeCancelamento>(`${BASE}/cancelamento/${id}`);
+    return await this.httpClient.get<DfeCancelamento>(`${BASE}/${id}/cancelamento`);
   }
 
   async consultarSolicitacaoCorrecao(id: string): Promise<CteCartaCorrecao> {
@@ -82,13 +82,13 @@ export class CTeService {
   }
 
   async baixarPDFCancelamento(id: string): Promise<Buffer> {
-    return await this.httpClient.get<Buffer>(`${BASE}/cancelamento/${id}/pdf`, {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/cancelamento/pdf`, {
       responseType: 'arraybuffer',
     });
   }
 
   async baixarXMLCancelamento(id: string): Promise<Buffer> {
-    return await this.httpClient.get<Buffer>(`${BASE}/cancelamento/${id}/xml`, {
+    return await this.httpClient.get<Buffer>(`${BASE}/${id}/cancelamento/xml`, {
       responseType: 'arraybuffer',
     });
   }
