@@ -36,7 +36,7 @@ export class CTeOsService {
   }
 
   async emitir(dados: CteOsPedidoEmissao): Promise<Dfe> {
-    return await this.httpClient.post<Dfe>(`${BASE}/emitir`, dados);
+    return await this.httpClient.post<Dfe>(BASE, dados);
   }
 
   async sincronizar(id: string): Promise<DfeSincronizacao> {
@@ -47,8 +47,8 @@ export class CTeOsService {
     return await this.httpClient.post<CteOsCartaCorrecao>(`${BASE}/${id}/carta-correcao`, dados);
   }
 
-  async cancelar(dados: CteOsPedidoCancelamento): Promise<DfeCancelamento> {
-    return await this.httpClient.post<DfeCancelamento>(`${BASE}/cancelamento`, dados);
+  async cancelar(id: string, dados: CteOsPedidoCancelamento): Promise<DfeCancelamento> {
+    return await this.httpClient.post<DfeCancelamento>(`${BASE}/${id}/cancelamento`, dados);
   }
 
   async baixarPDF(id: string): Promise<Buffer> {

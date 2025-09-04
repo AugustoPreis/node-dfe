@@ -36,11 +36,11 @@ export class CTeService {
   }
 
   async emitir(dados: CtePedidoEmissao): Promise<Dfe> {
-    return await this.httpClient.post<Dfe>(`${BASE}/emitir`, dados);
+    return await this.httpClient.post<Dfe>(BASE, dados);
   }
 
   async emitirSimplificado(dados: CteSimpPedidoEmissao): Promise<Dfe> {
-    return await this.httpClient.post<Dfe>(`${BASE}/emitir`, dados);
+    return await this.httpClient.post<Dfe>(`${BASE}/simp`, dados);
   }
 
   async sincronizar(id: string): Promise<DfeSincronizacao> {
