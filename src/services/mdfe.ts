@@ -56,7 +56,7 @@ export class MDFeService {
   }
 
   async emitir(dados: MdfePedidoEmissao): Promise<Dfe> {
-    return await this.httpClient.post<Dfe>(`${BASE}/emissao`, dados);
+    return await this.httpClient.post<Dfe>(`${BASE}`, dados);
   }
 
   async emitirLote(dados: MdfePedidoEmissaoLote): Promise<DfeLote> {
