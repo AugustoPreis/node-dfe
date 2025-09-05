@@ -31,8 +31,8 @@ export class NFComService {
     return await this.httpClient.post<Dfe>(BASE, dados);
   }
 
-  async cancelar(dados: NfcomPedidoCancelamento): Promise<DfeCancelamento> {
-    return await this.httpClient.post<DfeCancelamento>(`${BASE}/cancelamento`, dados);
+  async cancelar(id: string, dados: NfcomPedidoCancelamento): Promise<DfeCancelamento> {
+    return await this.httpClient.post<DfeCancelamento>(`${BASE}/${id}/cancelamento`, dados);
   }
 
   async baixarPDF(id: string): Promise<Buffer> {
