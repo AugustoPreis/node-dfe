@@ -15,7 +15,7 @@ jest.mock('../../core/httpClient', () => {
   };
 });
 
-describe('CTeService', () => {
+describe('NFCeService', () => {
   let httpClient: jest.Mocked<HttpClient>;
   let nfceService: NFCeService;
 

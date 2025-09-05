@@ -14,7 +14,7 @@ jest.mock('../../core/httpClient', () => {
   };
 });
 
-describe('EmpresaService', () => {
+describe('MDFeService', () => {
   let httpClient: jest.Mocked<HttpClient>;
   let mdfeService: MDFeService;
 
