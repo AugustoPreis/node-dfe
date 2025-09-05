@@ -81,7 +81,7 @@ export class NFeService {
   }
 
   async consultarInutilizacaoSequencia(id: string): Promise<DfeInutilizacao> {
-    return await this.httpClient.get<DfeInutilizacao>(`${BASE}/eventos/${id}`);
+    return await this.httpClient.get<DfeInutilizacao>(`${BASE}/inutilizacoes/${id}`);
   }
 
   async consultarStatusServico(params: DfeConsultaStatusServicoQuery): Promise<DfeSefazStatus> {
